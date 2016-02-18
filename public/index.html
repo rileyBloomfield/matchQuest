@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="matchQuest" resize>
+<html>
 
 <head>
     <!-- Meta Data -->
@@ -14,54 +14,26 @@
     <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- Linked Scripts -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
     <script src="https://code.createjs.com/tweenjs-0.6.2.min.js"></script>
-    <script src="js/application.js"></script>
-    <script src="js/services.js"></script>
-    <script src="js/controllers.js"></script>
-    <script src="js/directives.js"></script>
-    <script src="js/netInterface.js"></script>
+    <script src="https://code.createjs.com/preloadjs-0.6.2.min.js"></script>
+    <script src="js/init.js"></script>
 
     <title>Match Quest</title>
 </head>
 
-<body class="index">
-    <!-- Navigation -->
-    <nav class="navbar navbar-default navbar-fixed-top" ng-controller="mainController">
+    <body class="index" onload="init();">
         <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header page-scroll">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <p class="navbar-brand">Match Quest</p>
+            <div class="row">
+                <div class="col-lg-2"></div>
+                <div class="col-lg-8">
+                        <canvas id="canvas" width="800" height="600"></canvas>
+                </div>
+                <div class="col-lg-2"></div>
             </div>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="hidden">
-                        <a href="#"></a>
-                    </li>
-                    <li class="page-scroll" ng-repeat="button in topButtons">
-                        <a ng-click="this[button]();">{{button}}</a>
-                    </li>
-                </ul>
-            </div>
-            <!-- /.navbar-collapse -->
         </div>
-        <!-- /.container-fluid -->
-    </nav>
-    <br><br><br>
-
-    <!-- View Injection -->
-    <div ng-view win-Resize callback-fn="windowResize(width, height)"></div>
 
     <!-- Main Page Footer -->
     <footer class="text-center">
