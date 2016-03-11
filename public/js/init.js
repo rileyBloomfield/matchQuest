@@ -21,6 +21,7 @@ function stdLevel(backgroundSrc, grid, iconFiles, numMoves) {
                       "icons/moonSprite.png",
                       "icons/flowerSprite.png"],
     this.numMoves = 10 || numMoves,
+    this.iconSize = 55,
     this.brightness = 0,
     this.lowerDaylight = function() {
         this.brightness -= 180/this.numMoves;
@@ -132,6 +133,9 @@ function init() {
             //Container to hold icons together
             var iconContainer = new createjs.Container();
 
+            //Set of all displayObjects
+            var icons = [];
+
             //Create Animated Icons from Icon Data
             var iconData = [];
             level.iconFiles.forEach(function(file) {
@@ -159,38 +163,74 @@ function init() {
                         });
                         icon.scaleX=0.5;
                         icon.scaleY=0.5;
-                        icon.x = 100 + index * 55;
-                        icon.y = 25 + row * 55;
+                        icon.x = index * level.iconSize;
+                        icon.y = row * level.iconSize;
                         iconContainer.addChild(icon);
                     });
                 });
+
+                //Shift the iconContainer where we want it on the screen and add to stage
+                iconContainer.x = 100;
+                iconContainer.y = 25;
                 this.canvas.stage.addChild(iconContainer);
             }
 
             function handleClick(row, index) {
+                //gets rid of specific icon --> iconContainer.removeChild(icon);
                 if(prevSelected) {
-                    currSelected = { row: row, column: index }
+                    currSelected = { row: row, column: index}
+
+                    //Selected icons are adjacent, make the move
                     if (isAdjacent()) {
-                        var old = level.grid[currSelected.row][currSelected.column];
+                        console.log(level.grid);
+                        //hold values for swapping grids
+                        var tempCurr = level.grid[currSelected.row][currSelected.column],
+                            tempPrev = level.grid[prevSelected.row][prevSelected.column];
+
+                        //Make the swap on the grid
                         level.grid[currSelected.row][currSelected.column] = level.grid[prevSelected.row][prevSelected.column];
-                        level.grid[prevSelected.row][prevSelected.column] = old;
-                        drawIcons();
+                        level.grid[prevSelected.row][prevSelected.column] = tempCurr;
+                        console.log(level.grid);
+                        //Make swap animation on icons
+
+                        //If the move does not result in a match, move them back
+                        if (!isMatch(currSelected, prevSelected)) {
+                            //Swap grid elements back
+                            level.grid[currSelected.row][currSelected.column] = tempCurr;
+                            level.grid[prevSelected.row][prevSelected.column] = tempPrev;
+                            //Animate switch back
+                            drawIcons();
+                        }
+                        //Lower daylight as move has been completed
+                        level.lowerDaylight();
                     }
                     currSelected = null;
                     prevSelected = null;
                 }
                 else {
                     prevSelected = { row: row, column: index }
-                    prevIcon = this.canvas.stage.getObjectUnderPoint();
                 }
             }
 
             function isAdjacent() {
                 //Check if two selected icons are beside each other before allowing a swap
-                return true;
+                if(Math.abs(prevSelected.column - currSelected.column) == 1) {
+                    if(prevSelected.row - currSelected.row == 0)
+                        return true;
+                }
+                else if (Math.abs(prevSelected.row - currSelected.row) == 1) {
+                    if(prevSelected.column - currSelected.column == 0)
+                        return true;
+                }
+                else
+                    return false;
             }
 
-            function isMatch() {
+            function isMatch(firstIconCoords, secondIconCoords) {
+                var matchLength = 0;
+
+                //checkVertical match
+
                 //Check if a swap results in a match
                 return true;
             }
