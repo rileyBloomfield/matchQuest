@@ -20,6 +20,7 @@ function stdLevel(backgroundSrc, grid, iconFiles, numMoves) {
                       "icons/sunSprite.png",
                       "icons/moonSprite.png",
                       "icons/flowerSprite.png"],
+    this.iconSize = 55,
     this.numMoves = 10 || numMoves,
     this.brightness = 0,
     this.lowerDaylight = function() {
@@ -155,33 +156,34 @@ function init() {
                         var icon = new createjs.Sprite(logSheet);
                         var helper = new createjs.ButtonHelper(icon, "normal", "hover", "clicked");
                         icon.addEventListener("click", function(event) {
-                            handleClick(row, index);
+                            handleClick(row, index, icon);
                         });
                         icon.scaleX=0.5;
                         icon.scaleY=0.5;
-                        icon.x = 100 + index * 55;
-                        icon.y = 25 + row * 55;
+                        icon.x = index * level.iconSize;
+                        icon.y = row * level.iconSize;
                         iconContainer.addChild(icon);
                     });
                 });
                 this.canvas.stage.addChild(iconContainer);
             }
 
-            function handleClick(row, index) {
+            function handleClick(row, index, icon) {
                 if(prevSelected) {
-                    currSelected = { row: row, column: index }
+                    currSelected = { row: row, column: index, icon:icon }
                     if (isAdjacent()) {
                         var old = level.grid[currSelected.row][currSelected.column];
                         level.grid[currSelected.row][currSelected.column] = level.grid[prevSelected.row][prevSelected.column];
                         level.grid[prevSelected.row][prevSelected.column] = old;
-                        drawIcons();
+
+                        createjs.Tween.get(prevSelected.icon, { loop: false }).to({ x: currSelected.icon.x, y:currSelected.icon.y }, 1000, createjs.Ease.getPowInOut(4));
+                        createjs.Tween.get(currSelected.icon, { loop: false }).to({ x: prevSelected.icon.x, y:prevSelected.icon.y }, 1000, createjs.Ease.getPowInOut(4));
                     }
                     currSelected = null;
                     prevSelected = null;
                 }
                 else {
-                    prevSelected = { row: row, column: index }
-                    prevIcon = this.canvas.stage.getObjectUnderPoint();
+                    prevSelected = { row: row, column: index, icon: icon }
                 }
             }
 
