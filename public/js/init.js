@@ -159,7 +159,9 @@ function init() {
                         var icon = new createjs.Sprite(logSheet);
                         var helper = new createjs.ButtonHelper(icon, "normal", "hover", "clicked");
                         icon.addEventListener("click", function(event) {
-                            handleClick(row, index);
+                            console.log(level.grid);
+                            handleClick(row, index, icon);
+                            console.log(level.grid);
                         });
                         icon.scaleX=0.5;
                         icon.scaleY=0.5;
@@ -175,14 +177,14 @@ function init() {
                 this.canvas.stage.addChild(iconContainer);
             }
 
-            function handleClick(row, index) {
+            function handleClick(row, index, icon) {
                 //gets rid of specific icon --> iconContainer.removeChild(icon);
                 if(prevSelected) {
-                    currSelected = { row: row, column: index}
+                    currSelected = { row: row, column: index, icon:icon}
 
                     //Selected icons are adjacent, make the move
-                    if (isAdjacent()) {
-                        console.log(level.grid);
+                    if (isAdjacent(currSelected, prevSelected)) {
+                        
                         //hold values for swapping grids
                         var tempCurr = level.grid[currSelected.row][currSelected.column],
                             tempPrev = level.grid[prevSelected.row][prevSelected.column];
@@ -190,16 +192,17 @@ function init() {
                         //Make the swap on the grid
                         level.grid[currSelected.row][currSelected.column] = level.grid[prevSelected.row][prevSelected.column];
                         level.grid[prevSelected.row][prevSelected.column] = tempCurr;
-                        console.log(level.grid);
-                        //Make swap animation on icons
 
+                        //Make swap animation on icons
+                        createjs.Tween.get(currSelected.icon, { loop: false }).to({ x: prevSelected.icon.x, y: prevSelected.icon.y }, 500, createjs.Ease.getPowInOut(6));
+                        createjs.Tween.get(prevSelected.icon, { loop: false }).to({ x: currSelected.icon.x, y: currSelected.icon.y }, 500, createjs.Ease.getPowInOut(6));
+                        
                         //If the move does not result in a match, move them back
                         if (!isMatch(currSelected, prevSelected)) {
                             //Swap grid elements back
                             level.grid[currSelected.row][currSelected.column] = tempCurr;
                             level.grid[prevSelected.row][prevSelected.column] = tempPrev;
                             //Animate switch back
-                            drawIcons();
                         }
                         //Lower daylight as move has been completed
                         level.lowerDaylight();
@@ -208,11 +211,11 @@ function init() {
                     prevSelected = null;
                 }
                 else {
-                    prevSelected = { row: row, column: index }
+                    prevSelected = { row: row, column: index, icon:icon }
                 }
             }
 
-            function isAdjacent() {
+            function isAdjacent(currSelected, prevSelected) {
                 //Check if two selected icons are beside each other before allowing a swap
                 if(Math.abs(prevSelected.column - currSelected.column) == 1) {
                     if(prevSelected.row - currSelected.row == 0)
