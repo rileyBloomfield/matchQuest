@@ -133,8 +133,12 @@ function init() {
             //Container to hold icons together
             var iconContainer = new createjs.Container();
 
-            //Set of all displayObjects
-            var icons = [];
+            //Set of all tiles
+            var tiles = [];
+
+            function tile(xPos, yPos, icon) {
+
+            }
 
             //Create Animated Icons from Icon Data
             var iconData = [];
@@ -155,14 +159,15 @@ function init() {
                 //Add All Icons to Stage
                 level.grid.forEach(function(result, row) {
                     result.forEach(function(column, index) {
-                        var logSheet = new createjs.SpriteSheet(iconData[level.grid[row][index]]);
-                        var icon = new createjs.Sprite(logSheet);
+                        var spriteSheet = new createjs.SpriteSheet(iconData[level.grid[row][index]]);
+                        var icon = new createjs.Sprite(spriteSheet);
                         var helper = new createjs.ButtonHelper(icon, "normal", "hover", "clicked");
                         icon.addEventListener("click", function(event) {
-                            console.log(level.grid);
-                            handleClick(row, index, icon);
-                            console.log(level.grid);
+                            handleClick(icon);
                         });
+                        icon.type = level.grid[row][index];
+                        icon.xPos = index;
+                        icon.yPos = row;
                         icon.scaleX=0.5;
                         icon.scaleY=0.5;
                         icon.x = index * level.iconSize;
@@ -177,31 +182,30 @@ function init() {
                 this.canvas.stage.addChild(iconContainer);
             }
 
-            function handleClick(row, index, icon) {
+            function handleClick(icon) {
                 //gets rid of specific icon --> iconContainer.removeChild(icon);
                 if(prevSelected) {
-                    currSelected = { row: row, column: index, icon:icon}
+                    currSelected = icon;
 
                     //Selected icons are adjacent, make the move
-                    if (isAdjacent(currSelected, prevSelected)) {
-                        
-                        //hold values for swapping grids
-                        var tempCurr = level.grid[currSelected.row][currSelected.column],
-                            tempPrev = level.grid[prevSelected.row][prevSelected.column];
+                    if (isAdjacent()) {
 
-                        //Make the swap on the grid
-                        level.grid[currSelected.row][currSelected.column] = level.grid[prevSelected.row][prevSelected.column];
-                        level.grid[prevSelected.row][prevSelected.column] = tempCurr;
+                        //swap grid elements
+                        var tempXPos = currSelected.xPos,
+                            tempYPos = currSelected.yPos;
+                        currSelected.xPos = prevSelected.xPos;
+                        currSelected.yPos = prevSelected.yPos;
+                        prevSelected.xPos = tempXPos;
+                        prevSelected.yPos = tempYPos;
 
                         //Make swap animation on icons
-                        createjs.Tween.get(currSelected.icon, { loop: false }).to({ x: prevSelected.icon.x, y: prevSelected.icon.y }, 500, createjs.Ease.getPowInOut(6));
-                        createjs.Tween.get(prevSelected.icon, { loop: false }).to({ x: currSelected.icon.x, y: currSelected.icon.y }, 500, createjs.Ease.getPowInOut(6));
+                        createjs.Tween.get(currSelected, { loop: false }).to({ x: prevSelected.x, y: prevSelected.y }, 500, createjs.Ease.getPowInOut(6));
+                        createjs.Tween.get(prevSelected, { loop: false }).to({ x: currSelected.x, y: currSelected.y }, 500, createjs.Ease.getPowInOut(6));
                         
                         //If the move does not result in a match, move them back
-                        if (!isMatch(currSelected, prevSelected)) {
+                        if (!isMatch()) {
                             //Swap grid elements back
-                            level.grid[currSelected.row][currSelected.column] = tempCurr;
-                            level.grid[prevSelected.row][prevSelected.column] = tempPrev;
+                            
                             //Animate switch back
                         }
                         //Lower daylight as move has been completed
@@ -211,19 +215,21 @@ function init() {
                     prevSelected = null;
                 }
                 else {
-                    prevSelected = { row: row, column: index, icon:icon }
+                    prevSelected = icon;
                 }
             }
 
-            function isAdjacent(currSelected, prevSelected) {
+            function isAdjacent() {
                 //Check if two selected icons are beside each other before allowing a swap
-                if(Math.abs(prevSelected.column - currSelected.column) == 1) {
-                    if(prevSelected.row - currSelected.row == 0)
+                if(Math.abs(prevSelected.xPos - currSelected.xPos) == 1) {
+                    if(prevSelected.yPos - currSelected.yPos == 0){
                         return true;
+                    }
                 }
-                else if (Math.abs(prevSelected.row - currSelected.row) == 1) {
-                    if(prevSelected.column - currSelected.column == 0)
+                else if (Math.abs(prevSelected.yPos - currSelected.yPos) == 1) {
+                    if(prevSelected.xPos - currSelected.xPos == 0){
                         return true;
+                    }
                 }
                 else
                     return false;
@@ -236,6 +242,16 @@ function init() {
 
                 //Check if a swap results in a match
                 return true;
+            }
+
+            function moveTileLeft(tile) {
+
+            }
+            function moveTileRight(tile) {
+
+            }
+            function moveTileDown(tile) {
+
             }
         }       
 
