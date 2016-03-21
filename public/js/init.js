@@ -6,13 +6,13 @@ function stdLevel(backgroundSrc, grid, iconFiles, numMoves) {
     this.backgroundSrc = backgroundSrc || "http://read.pudn.com/downloads25/sourcecode/game/80278/RPG%20Programming/chapter3.2/sample__.jpg",
     this.grid = grid ||
                 [[1,2,1,1,2,1,0,1],
-                 [0,3,0,0,0,2,3,4],
-                 [0,0,2,4,3,1,0,0],
+                 [0,3,0,1,0,2,3,4],
+                 [2,0,2,4,3,1,0,0],
                  [0,1,2,4,0,3,1,0],
                  [4,2,0,2,4,0,4,2],
                  [0,3,0,0,2,3,1,0],
-                 [0,2,0,1,0,1,0,0],
-                 [0,4,0,0,3,4,1,1]],
+                 [2,2,1,0,3,1,0,0],
+                 [0,4,0,1,0,4,1,1]],
     this.background = "",
     this.iconFiles = iconFiles || 
                      ["icons/logSprite.png",
@@ -134,7 +134,14 @@ function init() {
             var iconContainer = new createjs.Container();
 
             //Set of all tiles
-            var tiles = [];
+            var tiles = [[0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0],
+                         [0,0,0,0,0,0,0,0]];
 
             function tile(xPos, yPos, icon) {
 
@@ -172,6 +179,7 @@ function init() {
                         icon.scaleY=0.5;
                         icon.x = index * level.iconSize;
                         icon.y = row * level.iconSize;
+                        tiles[index][row] = icon;
                         iconContainer.addChild(icon);
                     });
                 });
@@ -190,7 +198,7 @@ function init() {
                     //Selected icons are adjacent, make the move
                     if (isAdjacent()) {
 
-                        //swap grid elements
+                        //swap icon position attributes
                         var tempXPos = currSelected.xPos,
                             tempYPos = currSelected.yPos;
                         currSelected.xPos = prevSelected.xPos;
@@ -198,12 +206,20 @@ function init() {
                         prevSelected.xPos = tempXPos;
                         prevSelected.yPos = tempYPos;
 
+                        //swap on tiles grid
+                        tiles[currSelected.xPos][currSelected.yPos] = currSelected;
+                        tiles[prevSelected.xPos][prevSelected.yPos] = prevSelected;
+
                         //Make swap animation on icons
                         createjs.Tween.get(currSelected, { loop: false }).to({ x: prevSelected.x, y: prevSelected.y }, 500, createjs.Ease.getPowInOut(6));
                         createjs.Tween.get(prevSelected, { loop: false }).to({ x: currSelected.x, y: currSelected.y }, 500, createjs.Ease.getPowInOut(6));
+
+                        //wait for animation
                         
                         //If the move does not result in a match, move them back
-                        if (!isMatch()) {
+                        isMatch(currSelected);
+                        isMatch(prevSelected);
+                        if (false) {
                             //Swap grid elements back
                             
                             //Animate switch back
@@ -235,24 +251,96 @@ function init() {
                     return false;
             }
 
-            function isMatch(firstIconCoords, secondIconCoords) {
-                var matchLength = 0;
+            function isMatch(icon) {
+                var matchLength = 1,
+                    index,
+                    x,
+                    y, 
+                    matches = [],
+                    currMatch = [];
 
-                //checkVertical match
+            /*************** check currSelected icon *******************************************/
+                //Check horizontally
+                x = icon.xPos,
+                y = icon.yPos;
+                index = x;
+                while(index > 0) {
+                    index--;
+                    if (tiles[index][y].type == icon.type) {
+                        matchLength++;
+                        currMatch.push(tiles[index][y]);
+                    }
+                    else {
+                        break;
+                    }
+                }
+                index = x;
+                while(index < 7) {
+                    index++;
+                    if (tiles[index][y].type == icon.type) {
+                        matchLength++;
+                        currMatch.push(tiles[index][y]);
+                    }
+                    else {
+                        if(matchLength < 3)
+                            currMatch = [];
+                        break;
+                    }
+                }
 
-                //Check if a swap results in a match
+                if(matchLength >= 3) {
+                    console.log("Matched "+matchLength+" tile type "+currMatch[0].type);
+                    matches.push(currMatch);
+                }
+
+                //Check Vertically
+                x = icon.xPos,
+                y = icon.yPos;
+                matchLength = 1;
+                index = y;
+                while(index > 0) {
+                    index--;
+                    if (tiles[x][index].type == icon.type) {
+                        matchLength++;
+                        currMatch.push(tiles[x][index]);
+                    }
+                    else {
+                        break;
+                    }
+                }
+                index = y;
+                while(index < 7) {
+                    index++;
+                    if (tiles[x][index].type == icon.type) {
+                        matchLength++;
+                        currMatch.push(tiles[x][index]);
+                    }
+                    else {
+                        if(matchLength < 3)
+                            currMatch = [];
+                        break;
+                    }
+                }
+
+                if(matchLength >= 3) {
+                    console.log("Matched "+matchLength+" tile type "+currMatch[0].type);
+                    matches.push(currMatch);
+                }
+
+                if(matches.length == 0)
+                    return false;
+
+                for (var i=0; i<matches.length; i++) {
+                    for (var j=0; j<matches[i].length; j++) {
+                        tiles[matches[i][j].xPos][matches[i][j].yPos] = 0;
+                        iconContainer.removeChild(matches[i][j]);
+                    }
+                }
+                tiles[icon.xPos][icon.yPos]= 0;
+                iconContainer.removeChild(icon);
                 return true;
             }
 
-            function moveTileLeft(tile) {
-
-            }
-            function moveTileRight(tile) {
-
-            }
-            function moveTileDown(tile) {
-
-            }
         }       
 
         function renderCombatLevel() {
