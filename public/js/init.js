@@ -180,14 +180,24 @@ function init() {
                 icon.y = yPos * level.iconSize;
                 //console.log("Icon created at "+xPos+", "+yPos+" type: "+type);
                 iconContainer.addChild(icon);
-                createjs.Tween.get(icon, { loop: false }).to({ alpha: 0.25 }, 500);
+                createjs.Tween.get(icon, { loop: false }).to({ alpha: 1 }, 500);
                 tiles[xPos][yPos] = icon;
-                removeMatches(icon);
+                //removeAllMatches(icon);
             }
 
             function deleteTile(icon) {
-                    tiles[icon.xPos][icon.yPos] = 0;
-                    iconContainer.removeChild(icon);
+                if(icon.yPos === undefined)
+                    return;
+                tiles[icon.xPos][icon.yPos] = 0;
+                iconContainer.removeChild(icon);
+            }
+
+            function removeAllMatches() {
+                for(var i=0; i<8; i++) {
+                    for (var j=0; j<8; j++) {
+                        removeMatches(tiles[i][j]);
+                    }
+                }
             }
 
             function drawIcons() {
@@ -204,6 +214,7 @@ function init() {
                 iconContainer.x = 100;
                 iconContainer.y = 25;
                 this.canvas.stage.addChild(iconContainer);
+                removeAllMatches();
             }
 
             function handleClick(icon) {
@@ -231,20 +242,15 @@ function init() {
                         createjs.Tween.get(prevSelected, { loop: false }).to({ x: currSelected.x, y: currSelected.y }, 500, createjs.Ease.getPowInOut(6));
 
                         function handleNextIcon(currSelected, prevSelected) {
-                            removeMatches(currSelected);
-                            removeMatches(prevSelected);
+                            if(!removeMatches(currSelected) && !removeMatches(prevSelected)) {
+                                //no matches resulting, revert
+                            }
+                            else {
+                                removeAllMatches();
+                                //Lower daylight as move has been completed
+                                level.lowerDaylight();
+                            }
                         }
-                        //wait for animation
-                        
-                        //If the move does not result in a match, move them back
-
-                        if (false) {
-                            //Swap grid elements back
-                            
-                            //Animate switch back
-                        }
-                        //Lower daylight as move has been completed
-                        level.lowerDaylight();
                     }
                     currSelected = null;
                     prevSelected = null;
@@ -256,41 +262,44 @@ function init() {
 
             //pass in start location of tile, cascade will fill all holes at and above location
             function cascadeFill(column, row) {
-                //if top row, make new element
-                if(row == 0) {
-                    //make new random tile at top
-                    if(tiles[column][row] == 0) {
-                        createTile(column, row, Math.round(Math.random()*4));
-                        //removeMatches(tiles[column][row]);
-                    }
-                    return;
-                }
-                //not top element
-                else {
-                    //look through all tiles above to see if there is one to move down
-                    var index = 0;
-                    while(row - ++index >= 0) {
-                        //if yes, move it down and call on tile above current
-                        if(tiles[column][row-index] != 0) {
-                            //make tile at bottom same as top tile
-                            if(tiles[column][row]) {
-                                deleteTile(tiles[column][row]);
-                                tiles[column][row] = 0;
-                            }
-                            //create tile at desired position and delete from original
-                            createTile(column, row, tiles[column][row-index].type);
-                            deleteTile(tiles[column][row-index]);
-
-                            tiles[column][row-index] = 0;
-                            cascadeFill(column, row-1);
-                            return;
+                removeAllMatches();
+                setTimeout(function(){
+                    //if top row, make new element
+                    if(row == 0) {
+                        //make new random tile at top
+                        if(tiles[column][row] == 0) {
+                            createTile(column, row, Math.round(Math.random()*4));
                         }
+                        return;
                     }
-                    //if not, make new tile
-                    createTile(column, row, Math.round(Math.random()*4));
-                    cascadeFill(column, row-1);
-                    return;
-                }
+                    //not top element
+                    else {
+                        //look through all tiles above to see if there is one to move down
+                        var index = 0;
+                        while(row - ++index >= 0) {
+                            //if yes, move it down and call on tile above current
+                            if(tiles[column][row-index] != 0) {
+                                //make tile at bottom same as top tile
+                                if(tiles[column][row]) {
+                                    deleteTile(tiles[column][row]);
+                                    //tiles[column][row] = 0;
+                                }
+                                //create tile at desired position and delete from original
+                                createTile(column, row, tiles[column][row-index].type);
+                                deleteTile(tiles[column][row-index]);
+
+                                //tiles[column][row-index] = 0;
+                                cascadeFill(column, row-1);
+                                return;
+                            }
+                        }
+                        //if not, make new tile
+                        createTile(column, row, Math.round(Math.random()*4));
+                        cascadeFill(column, row-1);
+                        return;
+                    }
+                    }, 100);
+                
             }
 
             function isAdjacent() {
@@ -392,31 +401,19 @@ function init() {
                 lastMatch.push(tiles[icon.xPos][icon.yPos]);
                 matches.push(lastMatch);
 
-                //if there are matches, make them
+                //if there are matches, delete the tiles in the matches
                 for (var i=0; i<matches.length; i++) {
                     for (var j=0; j<matches[i].length; j++) {
                         deleteTile(matches[i][j]);
                     }
                 }
 
-                //call cascade fill on all icons removed
+                //call cascade fill on all tiles removed
                 matches.forEach(function(matchSet){
                     matchSet.forEach(function(icon) {
                         cascadeFill(icon.xPos, icon.yPos);
                     });
                 })
-
-                //cascadeFill(icon.xPos, icon.yPos);
-
-                //make a transposed copy for printing
-                //var newArray = tiles[0].map(function(col, i) { 
-                //  return tiles.map(function(row) { 
-                //    return row[i] 
-                // })
-                //});
-                //print tiles transposed
-                //console.log(newArray);
-
 
                 return true;
             }
