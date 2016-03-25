@@ -160,55 +160,17 @@ function init() {
             //Draw Icons on screen
             drawIcons();
 
-            /*
-            function createIcon(xPos, yPos, type) {
-                var spriteSheet = new createjs.SpriteSheet(iconData[level.grid[yPos][xPos]]);
-                var icon = new createjs.Sprite(spriteSheet);
-                var helper = new createjs.ButtonHelper(icon, "normal", "hover", "clicked");
-                icon.addEventListener("click", function(event) {
-                    handleClick(icon);
-                });
+            function createTile(xPos, yPos, type) {
+                if(tiles[xPos][yPos] != 0)
+                    return;
 
-                icon.type = type;
-                icon.xPos = xPos;
-                icon.yPos = yPos;
-                icon.scaleX=0.5;
-                icon.scaleY=0.5;
-                icon.x = xPos * level.iconSize;
-                icon.y = yPos * level.iconSize;
-
-                return icon;
-            }
-
-            function drawIcons() {
-                this.canvas.stage.removeChild(iconContainer);
-                iconContainer.removeAllChildren();
-                //Add All Icons to Stage
-                level.grid.forEach(function(result, row) {
-                    result.forEach(function(column, index) {
-                        
-                        var icon = createIcon(index, row, level.grid[row][index]);
-                        
-                        tiles[index][row] = icon;
-                        iconContainer.addChild(icon);
-                    });
-                });
-
-                //Shift the iconContainer where we want it on the screen and add to stage
-                iconContainer.x = 100;
-                iconContainer.y = 25;
-                this.canvas.stage.addChild(iconContainer);
-            }
-            */
-
-            function createIcon(xPos, yPos, type) {
                 var spriteSheet = new createjs.SpriteSheet(iconData[type]);
                 var icon = new createjs.Sprite(spriteSheet);
                 var helper = new createjs.ButtonHelper(icon, "normal", "hover", "clicked");
                 icon.addEventListener("click", function(event) {
                     handleClick(icon);
                 });
-                icon.alpha = 0.5;
+                icon.alpha = 0;
                 icon.type = type;
                 icon.xPos = xPos;
                 icon.yPos = yPos;
@@ -216,9 +178,16 @@ function init() {
                 icon.scaleY=0.5;
                 icon.x = xPos * level.iconSize;
                 icon.y = yPos * level.iconSize;
-                console.log("Icon created at "+xPos+", "+yPos+" type: "+type);
+                //console.log("Icon created at "+xPos+", "+yPos+" type: "+type);
                 iconContainer.addChild(icon);
-                return icon;
+                createjs.Tween.get(icon, { loop: false }).to({ alpha: 0.25 }, 500);
+                tiles[xPos][yPos] = icon;
+                removeMatches(icon);
+            }
+
+            function deleteTile(icon) {
+                    tiles[icon.xPos][icon.yPos] = 0;
+                    iconContainer.removeChild(icon);
             }
 
             function drawIcons() {
@@ -227,26 +196,7 @@ function init() {
                 //Add All Icons to Stage
                 level.grid.forEach(function(result, row) {
                     result.forEach(function(column, index) {
-                        var icon = createIcon(index, row, level.grid[index][row]);
-                        tiles[index][row] = icon;
-
-                        //iconContainer.addChild(icon);
-                        /*var spriteSheet = new createjs.SpriteSheet(iconData[level.grid[row][index]]);
-                        var icon = new createjs.Sprite(spriteSheet);
-                        var helper = new createjs.ButtonHelper(icon, "normal", "hover", "clicked");
-                        icon.addEventListener("click", function(event) {
-                            handleClick(icon);
-                        });
-                        icon.type = level.grid[row][index];
-                        icon.xPos = index;
-                        icon.yPos = row;
-                        icon.scaleX=0.5;
-                        icon.scaleY=0.5;
-                        icon.x = index * level.iconSize;
-                        icon.y = row * level.iconSize;
-                        tiles[index][row] = icon;
-                        iconContainer.addChild(icon);*/
-
+                        createTile(index, row, level.grid[index][row]);
                     });
                 });
 
@@ -309,8 +259,10 @@ function init() {
                 //if top row, make new element
                 if(row == 0) {
                     //make new random tile at top
-                    if(tiles[column][row] == 0)
-                        tiles[column][row] = createIcon(column, row, Math.round(Math.random()*4));
+                    if(tiles[column][row] == 0) {
+                        createTile(column, row, Math.round(Math.random()*4));
+                        //removeMatches(tiles[column][row]);
+                    }
                     return;
                 }
                 //not top element
@@ -322,19 +274,20 @@ function init() {
                         if(tiles[column][row-index] != 0) {
                             //make tile at bottom same as top tile
                             if(tiles[column][row]) {
-                                iconContainer.removeChild(tiles[column][row]);
+                                deleteTile(tiles[column][row]);
                                 tiles[column][row] = 0;
                             }
-                            tiles[column][row] = createIcon(column, row, tiles[column][row-index].type);
-                            //remove top tile
-                            iconContainer.removeChild(tiles[column][row-index]);
+                            //create tile at desired position and delete from original
+                            createTile(column, row, tiles[column][row-index].type);
+                            deleteTile(tiles[column][row-index]);
+
                             tiles[column][row-index] = 0;
                             cascadeFill(column, row-1);
                             return;
                         }
                     }
                     //if not, make new tile
-                    tiles[column][row] = createIcon(column, row, Math.round(Math.random()*4));
+                    createTile(column, row, Math.round(Math.random()*4));
                     cascadeFill(column, row-1);
                     return;
                 }
@@ -442,8 +395,7 @@ function init() {
                 //if there are matches, make them
                 for (var i=0; i<matches.length; i++) {
                     for (var j=0; j<matches[i].length; j++) {
-                        tiles[matches[i][j].xPos][matches[i][j].yPos] = 0;
-                        iconContainer.removeChild(matches[i][j]);
+                        deleteTile(matches[i][j]);
                     }
                 }
 
