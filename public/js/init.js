@@ -160,13 +160,78 @@ function init() {
             //Draw Icons on screen
             drawIcons();
 
+            /*
+            function createIcon(xPos, yPos, type) {
+                var spriteSheet = new createjs.SpriteSheet(iconData[level.grid[yPos][xPos]]);
+                var icon = new createjs.Sprite(spriteSheet);
+                var helper = new createjs.ButtonHelper(icon, "normal", "hover", "clicked");
+                icon.addEventListener("click", function(event) {
+                    handleClick(icon);
+                });
+
+                icon.type = type;
+                icon.xPos = xPos;
+                icon.yPos = yPos;
+                icon.scaleX=0.5;
+                icon.scaleY=0.5;
+                icon.x = xPos * level.iconSize;
+                icon.y = yPos * level.iconSize;
+
+                return icon;
+            }
+
             function drawIcons() {
                 this.canvas.stage.removeChild(iconContainer);
                 iconContainer.removeAllChildren();
                 //Add All Icons to Stage
                 level.grid.forEach(function(result, row) {
                     result.forEach(function(column, index) {
-                        var spriteSheet = new createjs.SpriteSheet(iconData[level.grid[row][index]]);
+                        
+                        var icon = createIcon(index, row, level.grid[row][index]);
+                        
+                        tiles[index][row] = icon;
+                        iconContainer.addChild(icon);
+                    });
+                });
+
+                //Shift the iconContainer where we want it on the screen and add to stage
+                iconContainer.x = 100;
+                iconContainer.y = 25;
+                this.canvas.stage.addChild(iconContainer);
+            }
+            */
+
+            function createIcon(xPos, yPos, type) {
+                var spriteSheet = new createjs.SpriteSheet(iconData[type]);
+                var icon = new createjs.Sprite(spriteSheet);
+                var helper = new createjs.ButtonHelper(icon, "normal", "hover", "clicked");
+                icon.addEventListener("click", function(event) {
+                    handleClick(icon);
+                });
+
+                icon.type = type;
+                icon.xPos = xPos;
+                icon.yPos = yPos;
+                icon.scaleX=0.5;
+                icon.scaleY=0.5;
+                icon.x = xPos * level.iconSize;
+                icon.y = yPos * level.iconSize;
+                iconContainer.addChild(icon);
+                console.log("Added tile at "+xPos+","+yPos);
+                return icon;
+            }
+
+            function drawIcons() {
+                this.canvas.stage.removeChild(iconContainer);
+                iconContainer.removeAllChildren();
+                //Add All Icons to Stage
+                level.grid.forEach(function(result, row) {
+                    result.forEach(function(column, index) {
+                        var icon = createIcon(index, row, level.grid[index][row]);
+                        tiles[index][row] = icon;
+
+                        //iconContainer.addChild(icon);
+                        /*var spriteSheet = new createjs.SpriteSheet(iconData[level.grid[row][index]]);
                         var icon = new createjs.Sprite(spriteSheet);
                         var helper = new createjs.ButtonHelper(icon, "normal", "hover", "clicked");
                         icon.addEventListener("click", function(event) {
@@ -180,7 +245,8 @@ function init() {
                         icon.x = index * level.iconSize;
                         icon.y = row * level.iconSize;
                         tiles[index][row] = icon;
-                        iconContainer.addChild(icon);
+                        iconContainer.addChild(icon);*/
+
                     });
                 });
 
@@ -217,8 +283,8 @@ function init() {
                         //wait for animation
                         
                         //If the move does not result in a match, move them back
-                        isMatch(currSelected);
-                        isMatch(prevSelected);
+                        removeMatches(currSelected);
+                        removeMatches(prevSelected);
                         if (false) {
                             //Swap grid elements back
                             
@@ -232,6 +298,35 @@ function init() {
                 }
                 else {
                     prevSelected = icon;
+                }
+            }
+
+            //pass in start location of tile, cascade will fill all holes at and above location
+            function cascadeFill(column, row) {
+                //if top row, make new element
+                if(row == 0) {
+                    //make new random tile at top
+                    tiles[column][row] = createIcon(column, row, Math.round(Math.random()*4));
+                    return;
+                }
+                //not top element
+                else {
+                    //look through all tiles above to see if there is one to move down
+                    var index = 0;
+                    while(row - ++index >= 0) {
+                        //if yes, move it down and call on tile above current
+                        if(tiles[column][row-index] != 0) {
+                            tiles[column][row] = createIcon(column, row, tiles[column][row-index].type);
+                            iconContainer.removeChild(tiles[column][row-index]);
+                            tiles[column][row-index] = 0;
+                            cascadeFill(column, row-1);
+                            return;
+                        }
+                    }
+                    //if not, make new tile
+                    tiles[column][row] = createIcon(column, row, Math.round(Math.random()*4));
+                    cascadeFill(column, row-1);
+                    return;
                 }
             }
 
@@ -251,7 +346,7 @@ function init() {
                     return false;
             }
 
-            function isMatch(icon) {
+            function removeMatches(icon) {
                 var matchLength = 1,
                     index,
                     x,
@@ -330,18 +425,41 @@ function init() {
                 if(matches.length == 0)
                     return false;
 
+                var lastMatch = [];
+                lastMatch.push(tiles[icon.xPos][icon.yPos]);
+                matches.push(lastMatch);
+
+                //if there are matches, make them
                 for (var i=0; i<matches.length; i++) {
                     for (var j=0; j<matches[i].length; j++) {
                         tiles[matches[i][j].xPos][matches[i][j].yPos] = 0;
                         iconContainer.removeChild(matches[i][j]);
                     }
                 }
-                tiles[icon.xPos][icon.yPos]= 0;
-                iconContainer.removeChild(icon);
+
+                //call cascade fill on all icons removed
+                matches.forEach(function(matchSet){
+                    matchSet.forEach(function(icon) {
+                        cascadeFill(icon.xPos, icon.yPos);
+                    });
+                })
+
+                //cascadeFill(icon.xPos, icon.yPos);
+
+                //make a transposed copy for printing
+                //var newArray = tiles[0].map(function(col, i) { 
+                //  return tiles.map(function(row) { 
+                //    return row[i] 
+                // })
+                //});
+                //print tiles transposed
+                //console.log(newArray);
+
+
                 return true;
             }
 
-        }       
+        }      
 
         function renderCombatLevel() {
 
