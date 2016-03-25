@@ -208,7 +208,7 @@ function init() {
                 icon.addEventListener("click", function(event) {
                     handleClick(icon);
                 });
-
+                icon.alpha = 0.5;
                 icon.type = type;
                 icon.xPos = xPos;
                 icon.yPos = yPos;
@@ -216,8 +216,8 @@ function init() {
                 icon.scaleY=0.5;
                 icon.x = xPos * level.iconSize;
                 icon.y = yPos * level.iconSize;
+                console.log("Icon created at "+xPos+", "+yPos+" type: "+type);
                 iconContainer.addChild(icon);
-                console.log("Added tile at "+xPos+","+yPos);
                 return icon;
             }
 
@@ -277,14 +277,17 @@ function init() {
                         tiles[prevSelected.xPos][prevSelected.yPos] = prevSelected;
 
                         //Make swap animation on icons
-                        createjs.Tween.get(currSelected, { loop: false }).to({ x: prevSelected.x, y: prevSelected.y }, 500, createjs.Ease.getPowInOut(6));
+                        createjs.Tween.get(currSelected, { loop: false }).to({ x: prevSelected.x, y: prevSelected.y }, 500, createjs.Ease.getPowInOut(6)).call(handleNextIcon, [currSelected, prevSelected], this);
                         createjs.Tween.get(prevSelected, { loop: false }).to({ x: currSelected.x, y: currSelected.y }, 500, createjs.Ease.getPowInOut(6));
 
+                        function handleNextIcon(currSelected, prevSelected) {
+                            removeMatches(currSelected);
+                            removeMatches(prevSelected);
+                        }
                         //wait for animation
                         
                         //If the move does not result in a match, move them back
-                        removeMatches(currSelected);
-                        removeMatches(prevSelected);
+
                         if (false) {
                             //Swap grid elements back
                             
@@ -306,7 +309,8 @@ function init() {
                 //if top row, make new element
                 if(row == 0) {
                     //make new random tile at top
-                    tiles[column][row] = createIcon(column, row, Math.round(Math.random()*4));
+                    if(tiles[column][row] == 0)
+                        tiles[column][row] = createIcon(column, row, Math.round(Math.random()*4));
                     return;
                 }
                 //not top element
@@ -316,7 +320,13 @@ function init() {
                     while(row - ++index >= 0) {
                         //if yes, move it down and call on tile above current
                         if(tiles[column][row-index] != 0) {
+                            //make tile at bottom same as top tile
+                            if(tiles[column][row]) {
+                                iconContainer.removeChild(tiles[column][row]);
+                                tiles[column][row] = 0;
+                            }
                             tiles[column][row] = createIcon(column, row, tiles[column][row-index].type);
+                            //remove top tile
                             iconContainer.removeChild(tiles[column][row-index]);
                             tiles[column][row-index] = 0;
                             cascadeFill(column, row-1);
