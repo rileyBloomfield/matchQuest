@@ -1,12 +1,16 @@
-var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize) {
+var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal) {
 	//Holders for matching
     var prevSelected = null,
         currSelected = null;
 
     var brightness = 0;
+    var goalMatches = [0,0,0,0,0];
 
 	//Container to hold icons together
     var iconContainer = new createjs.Container();
+
+    //container to hold status
+    var statusContainer = new createjs.Container();
 
     //Set of all tiles
     var tiles = [[0,0,0,0,0,0,0,0],
@@ -33,7 +37,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize) {
     });
 
     //Draw Icons on screen
-    drawIcons();
+    init();
 
     function createTile(xPos, yPos, type) {
         if(tiles[xPos][yPos] != 0)
@@ -61,7 +65,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize) {
     }
 
     function deleteTile(icon) {
-        if(icon.yPos === undefined)
+        if(icon.yPos === undefined || icon.xPos === undefined)
             return;
         tiles[icon.xPos][icon.yPos] = 0;
         iconContainer.removeChild(icon);
@@ -75,7 +79,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize) {
         }
     }
 
-    function drawIcons() {
+    function init() {
         stage.removeChild(iconContainer);
         iconContainer.removeAllChildren();
         //Add All Icons to Stage
@@ -86,10 +90,23 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize) {
         });
 
         //Shift the iconContainer where we want it on the screen and add to stage
-        iconContainer.x = 100;
+        iconContainer.x = 25;
         iconContainer.y = 25;
         stage.addChild(iconContainer);
-        removeAllMatches();
+
+        statusContainer.x = 50;
+        statusContainer.y = 490;
+        for(var i = 0; i<iconData.length; i++) {
+            var spriteSheet = new createjs.SpriteSheet(iconData[i]);
+            var icon = new createjs.Sprite(spriteSheet);
+            icon.x = 80*i;
+            icon.scaleY = 0.75;
+            icon.scaleX = 0.75;
+            statusContainer.addChild(icon);
+        }
+        stage.addChild(statusContainer);
+
+        //removeAllMatches();
     }
 
     function handleClick(icon) {
@@ -121,19 +138,10 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize) {
                         //no matches resulting, revert
                     }
                     else {
-                        removeAllMatches();
-                        
-                    }
-                    //Lower daylight as move has been completed
-				        brightness -= 180/numMoves;
-				        var matrix = new createjs.ColorMatrix().adjustBrightness(brightness);
-				            background.filters = [
-				                new createjs.ColorMatrixFilter(matrix)
-				        ];
-				        background.cache(0, 0, 800, 600);
-				        if(brightness < -180) {
-				        	createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
-				        }
+                        lowerBrightness();
+                        if(checkWin())
+                            alert("you win!");
+                    }	
                 }
             }
             currSelected = null;
@@ -146,7 +154,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize) {
 
     //pass in start location of tile, cascade will fill all holes at and above location
     function cascadeFill(column, row) {
-        removeAllMatches();
+        //removeAllMatches();
         setTimeout(function(){
             //if top row, make new element
             if(row == 0) {
@@ -209,7 +217,6 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize) {
             y, 
             matches = [],
             currMatch = [];
-
     /*************** check currSelected icon *******************************************/
         //Check horizontally
         x = icon.xPos,
@@ -241,6 +248,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize) {
 
         if(matchLength >= 3) {
             console.log("Matched "+matchLength+" tile type "+currMatch[0].type);
+            countMatch(currMatch[0].type);
             matches.push(currMatch);
         }
 
@@ -275,6 +283,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize) {
 
         if(matchLength >= 3) {
             console.log("Matched "+matchLength+" tile type "+currMatch[0].type);
+            countMatch(currMatch[0].type);
             matches.push(currMatch);
         }
 
@@ -298,7 +307,34 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize) {
                 cascadeFill(icon.xPos, icon.yPos);
             });
         })
-
         return true;
+    }
+
+    function lowerBrightness() {
+        brightness -= 180/numMoves;
+        var matrix = new createjs.ColorMatrix().adjustBrightness(brightness);
+            background.filters = [
+                new createjs.ColorMatrixFilter(matrix)
+        ];
+        background.cache(0, 0, 800, 600);
+        if(brightness < -180) {
+            createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
+            alert("You lose");
+            stateController.getInstance().getNextState();
+        }
+    }
+
+    function checkWin() {
+        console.log(goalMatches);
+        for(var i=0; i<goal.length; i++) {
+            if(goalMatches[i] < goal[i])
+                return false;
+        }
+        return true;
+    }
+
+    function countMatch(index) {
+        goalMatches[index]++;
+
     }
 }

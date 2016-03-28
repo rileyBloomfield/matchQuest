@@ -4,14 +4,32 @@ var netInterface = (function () {
   function init() {
 
     return {
-      getNextState: function() {
-        return stageData.std;
+      getMainMenu: function() {
+        return stageData.main;
       },
-      login: function(user, pass) {
-        return true;
+      getMapMenu: function() {
+        return stageData.map;
+      },
+      getStage: function(id) {
+        return stageData.stages[id];
+      },
+      loginUser: function(user, pass) {
+        //return player data
+        return {
+          user: user,
+          stages: [{
+            id: 0,
+            score: 12345
+          }, {
+            id: 1,
+            score: 12345
+          }]
+        };
       },
       createUser: function(user, pass) {
-        return true;
+        return {
+          stages: []
+        };
       }
     }
   }
@@ -31,12 +49,12 @@ var stageData = {
         src: "res/buttons/newGameButton.png",
         x: 350,
         y: 300,
-        handler: function() {}
+        handler: function() {stateController.getInstance().createUser(); stateController.getInstance().getNextState();}
     }, {
         src: "res/buttons/loadGameButton.png",
         x: 350,
         y: 400,
-        handler: function() {}
+        handler: function() {stateController.getInstance().loginUser(); stateController.getInstance().getNextState();}
     }, {
         src: "res/buttons/optionsButton.png",
         x: 350,
@@ -47,10 +65,25 @@ var stageData = {
   }, 
   map: {
     backgroundSrc: "res/backgrounds/mapMenu.gif",
-    buttons: [],
+    buttons: [{
+        src: "res/buttons/optionsButton.png",
+        x: 150,
+        y: 500,
+        handler: function() {stateController.getInstance().getStage(0);}
+    }, {
+        src: "res/buttons/optionsButton.png",
+        x: 250,
+        y: 500,
+        handler: function() {stateController.getInstance().getStage(1);}
+    }, {
+        src: "res/buttons/optionsButton.png",
+        x: 350,
+        y: 500,
+        handler: function() {stateController.getInstance().getStage(2);}
+    }],
     iconContainer: false
   },
-  std: {
+  stages: [{
     backgroundSrc: "res/backgrounds/stdBackground.jpg",
     buttons: [],
     iconContainer: {
@@ -68,9 +101,52 @@ var stageData = {
              [2,2,1,0,3,1,0,0],
              [0,4,0,1,0,4,1,1]],
       numMoves: 25,
-      iconSize: 55
+      iconSize: 55,
+      goal: [2, 2, 2, 2, 2]
     }
-  }
+  }, {
+    backgroundSrc: "res/backgrounds/cmbtBackground.jpg",
+    buttons: [],
+    iconContainer: {
+      iconData: ["icons/logSprite.png",
+                 "icons/waterSprite.png",
+                 "icons/sunSprite.png",
+                 "icons/moonSprite.png",
+                 "icons/flowerSprite.png"],
+      grid: [[1,2,1,1,2,1,0,1],
+             [0,3,0,1,0,2,3,4],
+             [2,0,2,4,3,1,0,0],
+             [0,1,2,4,0,3,1,0],
+             [4,2,0,2,4,0,4,2],
+             [0,3,0,0,2,3,1,0],
+             [2,2,1,0,3,1,0,0],
+             [0,4,0,1,0,4,1,1]],
+      numMoves: 25,
+      iconSize: 55,
+      goal: [20, 20, 20, 20, 20]
+    }
+  }, {
+    backgroundSrc: "res/backgrounds/bossBackground.jpg",
+    buttons: [],
+    iconContainer: {
+      iconData: ["icons/logSprite.png",
+                 "icons/waterSprite.png",
+                 "icons/sunSprite.png",
+                 "icons/moonSprite.png",
+                 "icons/flowerSprite.png"],
+      grid: [[1,2,1,1,2,1,0,1],
+             [0,3,0,1,0,2,3,4],
+             [2,0,2,4,3,1,0,0],
+             [0,1,2,4,0,3,1,0],
+             [4,2,0,2,4,0,4,2],
+             [0,3,0,0,2,3,1,0],
+             [2,2,1,0,3,1,0,0],
+             [0,4,0,1,0,4,1,1]],
+      numMoves: 25,
+      iconSize: 55,
+      goal: [20, 20, 20, 20, 20]
+    }
+  }]
 };
 
 
