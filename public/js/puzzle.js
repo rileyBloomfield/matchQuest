@@ -22,9 +22,9 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                  [0,0,0,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0]];
 
-    function tile(xPos, yPos, icon) {
 
-    }
+
+    var resourceLabels = [];
 
     //Create Animated Icons from Icon Data
     var iconData = [];
@@ -103,6 +103,12 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
             icon.scaleY = 0.75;
             icon.scaleX = 0.75;
             statusContainer.addChild(icon);
+
+            var text = new createjs.Text("0/"+goal[i], "20px Arial", "#ff7700");
+            text.x = 80*i;
+            text.textBaseline = "alphabetic";
+            resourceLabels.push(text);
+            statusContainer.addChild(text);
         }
         stage.addChild(statusContainer);
 
@@ -191,7 +197,6 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 return;
             }
             }, 100);
-        
     }
 
     function isAdjacent() {
@@ -335,6 +340,14 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
 
     function countMatch(index) {
         goalMatches[index]++;
+        changeText(resourceLabels[index], goalMatches[index]+"/"+goal[index]);
+    }
 
+    function changeText(child, value) {
+        var text = new createjs.Text(value, "20px Arial", "#ff7700");
+        text.x = child.x;
+        text.textBaseline = "alphabetic";
+        statusContainer.removeChild(child);
+        statusContainer.addChild(text);
     }
 }

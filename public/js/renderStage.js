@@ -1,40 +1,10 @@
-/*var canvas = (function() {
-	var instance;
-	function init() {
-		instance = new createjs.Stage("canvas");
-    	instance.enableMouseOver();
-    	return {
-		
-		}
-	}
-	return {
-		getInstance: function() {
-			if(!instance)
-				instance = init();
-			return instance;
-		}
-	}
-})();*/
-
 function renderStage(params) {
-	document.getElementById("canvas").innerHTML = "";
-
-	//get blank canvas
-	var canvas = new createjs.Stage("canvas");
-	canvas.enableMouseOver();
-	canvas.removeAllChildren();
-
-    //Init tick
-    createjs.Ticker.setFPS(30);
-    createjs.Ticker.addEventListener("tick", function() {
-        canvas.update();
-    });
-
+    canvas.removeAllChildren();
 	//render background
     var backgroundImg = new Image();
     backgroundImg.src = params.backgroundSrc;
     var backgroundBitmap = new createjs.Bitmap(backgroundImg);
-    //canvas.addChild(backgroundBitmap);
+    canvas.addChild(backgroundBitmap);
 
     //Render Buttons
     params.buttons.forEach(function(button) {
@@ -49,7 +19,7 @@ function renderStage(params) {
         var helper = new createjs.ButtonHelper(newButton, "normal", "hover", "clicked");
         newButton.x = button.x;
         newButton.y = button.y;
-        newButton.addEventListener("click", button.handler);
+        newButton.addEventListener("click", function(){button.handler()});
         newButton.gotoAndStop("normal");
         canvas.addChild(newButton);
     })
