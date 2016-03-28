@@ -340,14 +340,16 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
 
     function countMatch(index) {
         goalMatches[index]++;
-        changeText(resourceLabels[index], goalMatches[index]+"/"+goal[index]);
+        console.log(resourceLabels[index]);
+        changeText(resourceLabels[index], goalMatches[index]+"/"+goal[index], index);
     }
 
-    function changeText(child, value) {
+    function changeText(child, value, index) {
         var text = new createjs.Text(value, "20px Arial", "#ff7700");
         text.x = child.x;
         text.textBaseline = "alphabetic";
         statusContainer.removeChild(child);
+        resourceLabels[index] = text;
         statusContainer.addChild(text);
     }
 }
