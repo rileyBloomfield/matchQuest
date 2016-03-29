@@ -109,6 +109,7 @@ var stageData = {
     backgroundSrc: "res/backgrounds/cmbtBackground.jpg",
     type: "cmbt",
     buttons: [],
+    opponent: "res/opponents/eel.jpg",
     iconContainer: {
       iconData: ["icons/logSprite.png",
                  "icons/waterSprite.png",

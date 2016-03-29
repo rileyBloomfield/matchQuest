@@ -1,4 +1,4 @@
-var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal, id, type) {
+var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal, id, type, opponent) {
 	//Holders for matching
     var prevSelected = null,
         currSelected = null;
@@ -8,6 +8,8 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
     var brightness = 0;
     var goalMatches = [0,0,0,0,0];
     var stageScore = 0;
+    var health = 100,
+        oppHealth = 100;
 
 	//Container to hold icons together
     var iconContainer = new createjs.Container();
@@ -106,26 +108,49 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         clockContainer.x = 490;
         clockContainer.y = 25;
 
-        for(var i = 0; i<iconData.length; i++) {
-            var spriteSheet = new createjs.SpriteSheet(iconData[i]);
-            var icon = new createjs.Sprite(spriteSheet);
-            icon.x = 80*i;
-            icon.scaleY = 0.75;
-            icon.scaleX = 0.75;
-            statusContainer.addChild(icon);
+        if(type == "std") {
+            for(var i = 0; i<iconData.length; i++) {
+                var spriteSheet = new createjs.SpriteSheet(iconData[i]);
+                var icon = new createjs.Sprite(spriteSheet);
+                icon.x = 80*i;
+                icon.scaleY = 0.75;
+                icon.scaleX = 0.75;
+                statusContainer.addChild(icon);
 
-            var text = new createjs.Text("0/"+goal[i], "20px Arial", "#ff7700");
-            text.x = 80*i;
-            text.textBaseline = "alphabetic";
-            resourceLabels.push(text);
-            statusContainer.addChild(text);
+                var text = new createjs.Text("0/"+goal[i], "20px Arial", "#ff7700");
+                text.x = 80*i;
+                text.textBaseline = "alphabetic";
+                resourceLabels.push(text);
+                statusContainer.addChild(text);
+            }
         }
+        if(type == "cmbt") {
+                var img = new Image();
+                img.src = opponent;
+                var bitmap = new createjs.Bitmap(img);
+                bitmap.scaleY = 0.75;
+                bitmap.scaleX = 0.75;
+                statusContainer.addChild(bitmap);
 
-        //initialize daylight clock 
-        /*
-        var circle = new createjs.Shape();
-        circle.graphics.beginFill("red").drawCircle(150, 120, 100);
-        clockContainer.addChild(circle);*/
+                var text = new createjs.Text(oppHealth+"/100", "20px Arial", "#ff7700");
+                text.textBaseline = "alphabetic";
+                resourceLabels.push(text);
+                statusContainer.addChild(text);
+
+                var spriteSheet = new createjs.SpriteSheet(iconData[0]);
+                var icon = new createjs.Sprite(spriteSheet);
+                icon.x = 160;
+                icon.scaleY = 0.75;
+                icon.scaleX = 0.75;
+                statusContainer.addChild(icon);
+
+                var text = new createjs.Text(health+"/100", "20px Arial", "#ff7700");
+                text.x = 160;
+                text.textBaseline = "alphabetic";
+                resourceLabels.push(text);
+                statusContainer.addChild(text);
+
+        }
 
         stage.addChild(statusContainer);
         stage.addChild(clockContainer);
@@ -134,7 +159,27 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
     }
 
     function handleClick(icon) {
-        //gets rid of specific icon --> iconContainer.removeChild(icon);
+        //if combat, chance of attack on every click
+        if(type == "cmbt") {
+            if(Math.round(Math.random()*5) == 2) {
+                health -= 10;
+                changeText(resourceLabels[1], health+"/100", 1);
+                if (health <= 0 && !completed) {
+                    completed = true;
+                    createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
+                    setTimeout(function() {
+                        alert("You lose");
+                        stateController.getInstance().getNextState();
+                    }, 2000);
+                }
+            }
+            if(Math.round(Math.random()*25) == 3) {
+                if (oppHealth <= 90)
+                    oppHealth += 10;
+                changeText(resourceLabels[0], oppHealth+"/100", 0);
+            }
+
+        }
         if(prevSelected) {
             currSelected = icon;
 
@@ -161,8 +206,9 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                     removeMatches(prevSelected)
                     removeMatches(currSelected)
                     createjs.Sound.play("alertSound");
-                    lowerBrightness();
-                    	
+                    if(type != "cmbt") {
+                        lowerBrightness();
+                    }                    	
                 }
             }
             currSelected = null;
@@ -372,17 +418,49 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
     }
 
     function countMatch(index) {
-        goalMatches[index]++;
-        console.log(resourceLabels[index]);
-        changeText(resourceLabels[index], goalMatches[index]+"/"+goal[index], index);
+        if (type == "std") {
+            goalMatches[index]++;
+            changeText(resourceLabels[index], goalMatches[index]+"/"+goal[index], index);
+        }
+        if (type == "cmbt") {
+            if(index == 0) { //attack tile is matched
+                oppHealth -= 10;
+                changeText(resourceLabels[index], oppHealth+"/100", index);
+                if (oppHealth <= 0 && !completed) {
+                    completed = true;
+                    createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
+                    setTimeout(function(){
+                        createjs.Sound.play("successSound");
+                        alert("you have defeated the oppnent!");
+                        stateController.getInstance().stageComplete(id, 12345);
+                        stateController.getInstance().getNextState();
+                    }, 2000);
+                }
+            }
+            if (index == 1) { //health tile is matched
+                if (health <= 90)
+                    health += 10;
+                changeText(resourceLabels[index], health+"/100", index);
+            }
+        }
     }
 
     function changeText(child, value, index) {
-        var text = new createjs.Text(value, "20px Arial", "#ff7700");
-        text.x = child.x;
-        text.textBaseline = "alphabetic";
-        statusContainer.removeChild(child);
-        resourceLabels[index] = text;
-        statusContainer.addChild(text);
+        if(type == "std") {
+            var text = new createjs.Text(value, "20px Arial", "#ff7700");
+            text.x = child.x;
+            text.textBaseline = "alphabetic";
+            statusContainer.removeChild(child);
+            resourceLabels[index] = text;
+            statusContainer.addChild(text);
+        }
+        if(type == "cmbt") {
+            var text = new createjs.Text(value, "20px Arial", "#ff7700");
+            text.x = child.x;
+            text.textBaseline = "alphabetic";
+            statusContainer.removeChild(child);
+            resourceLabels[index] = text;
+            statusContainer.addChild(text);
+        }
     }
 }
