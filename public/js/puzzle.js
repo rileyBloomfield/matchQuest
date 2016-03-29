@@ -1,16 +1,22 @@
-var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal) {
+var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal, id) {
 	//Holders for matching
     var prevSelected = null,
         currSelected = null;
 
+    var completed = false;
+
     var brightness = 0;
     var goalMatches = [0,0,0,0,0];
+    var stageScore = 0;
 
 	//Container to hold icons together
     var iconContainer = new createjs.Container();
 
     //container to hold status
     var statusContainer = new createjs.Container();
+
+    //container for daylight update
+    var clockContainer = new createjs.Container();
 
     //Set of all tiles
     var tiles = [[0,0,0,0,0,0,0,0],
@@ -61,7 +67,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         iconContainer.addChild(icon);
         createjs.Tween.get(icon, { loop: false }).to({ alpha: 1 }, 500);
         tiles[xPos][yPos] = icon;
-        //removeAllMatches(icon);
+        removeAllMatches(icon);
     }
 
     function deleteTile(icon) {
@@ -96,6 +102,10 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
 
         statusContainer.x = 50;
         statusContainer.y = 490;
+
+        clockContainer.x = 490;
+        clockContainer.y = 25;
+
         for(var i = 0; i<iconData.length; i++) {
             var spriteSheet = new createjs.SpriteSheet(iconData[i]);
             var icon = new createjs.Sprite(spriteSheet);
@@ -110,7 +120,15 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
             resourceLabels.push(text);
             statusContainer.addChild(text);
         }
+
+        //initialize daylight clock 
+        /*
+        var circle = new createjs.Shape();
+        circle.graphics.beginFill("red").drawCircle(150, 120, 100);
+        clockContainer.addChild(circle);*/
+
         stage.addChild(statusContainer);
+        stage.addChild(clockContainer);
 
         //removeAllMatches();
     }
@@ -145,8 +163,6 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                     }
                     else {
                         lowerBrightness();
-                        if(checkWin())
-                            alert("you win!");
                     }	
                 }
             }
@@ -222,7 +238,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
             y, 
             matches = [],
             currMatch = [];
-    /*************** check currSelected icon *******************************************/
+
         //Check horizontally
         x = icon.xPos,
         y = icon.yPos;
@@ -312,6 +328,15 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 cascadeFill(icon.xPos, icon.yPos);
             });
         })
+        if(checkWin() && !completed) {
+            completed = true;
+            createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
+            setTimeout(function(){
+                alert("you win! score: "+stageScore);
+                stateController.getInstance().stageComplete(id, stageScore);
+                stateController.getInstance().getNextState();
+            }, 2000);
+        }
         return true;
     }
 
@@ -322,10 +347,13 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 new createjs.ColorMatrixFilter(matrix)
         ];
         background.cache(0, 0, 800, 600);
-        if(brightness < -180) {
+        if(brightness < -180 && !completed) {
+            completed = true;
             createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
-            alert("You lose");
-            stateController.getInstance().getNextState();
+            setTimeout(function() {
+                alert("You lose");
+                stateController.getInstance().getNextState();
+            }, 2000);
         }
     }
 

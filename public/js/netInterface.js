@@ -14,17 +14,17 @@ var netInterface = (function () {
         return stageData.stages[id];
       },
       loginUser: function(user, pass) {
-        //return player data
-        return {
-          user: user,
-          stages: [{
-            id: 0,
-            score: 12345
-          }, {
-            id: 1,
-            score: 12345
-          }]
-        };
+        for(var i=0; i<users.length; i++) {
+          if(users[i].user == user) {
+            if(users[i].pass == pass) {
+              return users[i].stages;
+            }
+            else {
+              $.notify("Incorrect password", "error");
+            }
+          }
+        }
+        return false;
       },
       createUser: function(user, pass) {
         return {
@@ -66,19 +66,19 @@ var stageData = {
   map: {
     backgroundSrc: "res/backgrounds/mapMenu.gif",
     buttons: [{
-        src: "res/buttons/optionsButton.png",
-        x: 150,
-        y: 500,
+        src: "res/buttons/playButton.png",
+        x: 240,
+        y: 450,
         handler: function() {stateController.getInstance().getStage(0);}
     }, {
-        src: "res/buttons/optionsButton.png",
-        x: 250,
-        y: 500,
+        src: "res/buttons/playButton.png",
+        x: 300,
+        y: 220,
         handler: function() {stateController.getInstance().getStage(1);}
     }, {
-        src: "res/buttons/optionsButton.png",
-        x: 350,
-        y: 500,
+        src: "res/buttons/playButton.png",
+        x: 610,
+        y: 150,
         handler: function() {stateController.getInstance().getStage(2);}
     }],
     iconContainer: false
@@ -148,6 +148,18 @@ var stageData = {
     }
   }]
 };
+
+var users = [{
+  user: "riley",
+  pass: "pass",
+  stages: [{
+    id: 0,
+    score: 12345
+  }, {
+    id: 1,
+    score: 12345
+  }]
+}]
 
 
 

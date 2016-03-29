@@ -1,4 +1,4 @@
-function renderStage(params) {
+function renderStage(params, id) {
     canvas.removeAllChildren();
 	//render background
     var backgroundImg = new Image();
@@ -24,9 +24,11 @@ function renderStage(params) {
         canvas.addChild(newButton);
     })
 
+
+
     //render icon container
     if(params.iconContainer) {
-    	var matchPuzzle = new puzzle(canvas, params.iconContainer.iconData, params.iconContainer.grid, params.iconContainer.numMoves, backgroundBitmap, params.iconContainer.iconSize, params.iconContainer.goal);
+    	var matchPuzzle = new puzzle(canvas, params.iconContainer.iconData, params.iconContainer.grid, params.iconContainer.numMoves, backgroundBitmap, params.iconContainer.iconSize, params.iconContainer.goal, id);
     }
 };
 

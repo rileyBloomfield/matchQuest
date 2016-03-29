@@ -8,6 +8,15 @@ var stateController = (function() {
 
 		return {
 			stageComplete: function(id, score) {
+				//search through all completed stages to update score (if better), if not exist, add stage completed
+				for (var i=0; i<state.stages.length; i++) {
+					if(state.stages[i].id == id) {
+						if(stage.stages[i].score < score) {
+							state.stages[i].score = score;
+						}
+						return;
+					}
+				}
 				state.stages.push({id: id, score: score});
 			},
 			getNextState: function(stage, score) {
@@ -16,24 +25,29 @@ var stateController = (function() {
 				}
 				if(!onMap) {
 					//state.stages.push({id: stage, score: score});
-					//onMap = true;
 					renderStage(net.getMapMenu());
 				}
 			},
 			getStage: function(id) {
 				if(id <= state.stages.length)
-					renderStage(net.getStage(id));
+					renderStage(net.getStage(id), id);
 				else {
-					//notify stage is not unlocked
+					$.notify("You have not completed to this point yet", "error"/*{style: 'happyblue', autoHide: true}*/);
 				}
 			},
 			loginUser: function(user, pass) {
-				state = net.loginUser(user, pass);
-				alert("logged in");
+				var user = prompt("Please enter your name");
+				var pass = prompt("Please enter your password");
+				if(user && pass) {
+					state = net.loginUser(user, pass);
+				}
 			},
 			createUser: function(user, pass) {
-				state = net.createUser(user, pass);
-				alert("user created");
+				var user = prompt("Please enter your name");
+				var pass = prompt("Please enter your password");
+				if(user && pass) {
+					state = net.createUser(user, pass);
+				}
 			}
 		}
 	}
