@@ -19,7 +19,10 @@ function renderStage(params, id) {
         var helper = new createjs.ButtonHelper(newButton, "normal", "hover", "clicked");
         newButton.x = button.x;
         newButton.y = button.y;
-        newButton.addEventListener("click", function(){button.handler()});
+        newButton.addEventListener("click", function(){
+            createjs.Sound.play("menuSound");
+            button.handler(); 
+        });
         newButton.gotoAndStop("normal");
         canvas.addChild(newButton);
     })
@@ -28,7 +31,7 @@ function renderStage(params, id) {
 
     //render icon container
     if(params.iconContainer) {
-    	var matchPuzzle = new puzzle(canvas, params.iconContainer.iconData, params.iconContainer.grid, params.iconContainer.numMoves, backgroundBitmap, params.iconContainer.iconSize, params.iconContainer.goal, id);
+    	var matchPuzzle = new puzzle(canvas, params.iconContainer.iconData, params.iconContainer.grid, params.iconContainer.numMoves, backgroundBitmap, params.iconContainer.iconSize, params.iconContainer.goal, id, params.type);
     }
 };
 

@@ -17,7 +17,7 @@ var netInterface = (function () {
         for(var i=0; i<users.length; i++) {
           if(users[i].user == user) {
             if(users[i].pass == pass) {
-              return users[i].stages;
+              return users[i];
             }
             else {
               $.notify("Incorrect password", "error");
@@ -49,12 +49,12 @@ var stageData = {
         src: "res/buttons/newGameButton.png",
         x: 350,
         y: 300,
-        handler: function() {stateController.getInstance().createUser(); stateController.getInstance().getNextState();}
+        handler: function() {$('#myModalHorizontal').modal('show'); stateController.getInstance().getNextState();}
     }, {
         src: "res/buttons/loadGameButton.png",
         x: 350,
         y: 400,
-        handler: function() {stateController.getInstance().loginUser(); stateController.getInstance().getNextState();}
+        handler: function() {$('#myModalVertical').modal('show'); stateController.getInstance().getNextState();}
     }, {
         src: "res/buttons/optionsButton.png",
         x: 350,
@@ -85,6 +85,7 @@ var stageData = {
   },
   stages: [{
     backgroundSrc: "res/backgrounds/stdBackground.jpg",
+    type: "std",
     buttons: [],
     iconContainer: {
       iconData: ["icons/logSprite.png",
@@ -106,6 +107,7 @@ var stageData = {
     }
   }, {
     backgroundSrc: "res/backgrounds/cmbtBackground.jpg",
+    type: "cmbt",
     buttons: [],
     iconContainer: {
       iconData: ["icons/logSprite.png",
@@ -127,6 +129,7 @@ var stageData = {
     }
   }, {
     backgroundSrc: "res/backgrounds/bossBackground.jpg",
+    type: "boss",
     buttons: [],
     iconContainer: {
       iconData: ["icons/logSprite.png",

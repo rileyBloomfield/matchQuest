@@ -1,4 +1,4 @@
-var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal, id) {
+var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal, id, type) {
 	//Holders for matching
     var prevSelected = null,
         currSelected = null;
@@ -67,7 +67,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         iconContainer.addChild(icon);
         createjs.Tween.get(icon, { loop: false }).to({ alpha: 1 }, 500);
         tiles[xPos][yPos] = icon;
-        removeAllMatches(icon);
+        removeMatches(icon);
     }
 
     function deleteTile(icon) {
@@ -158,12 +158,11 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 createjs.Tween.get(prevSelected, { loop: false }).to({ x: currSelected.x, y: currSelected.y }, 500, createjs.Ease.getPowInOut(6));
 
                 function handleNextIcon(currSelected, prevSelected) {
-                    if(!removeMatches(currSelected) && !removeMatches(prevSelected)) {
-                        //no matches resulting, revert
-                    }
-                    else {
-                        lowerBrightness();
-                    }	
+                    removeMatches(prevSelected)
+                    removeMatches(currSelected)
+                    createjs.Sound.play("alertSound");
+                    lowerBrightness();
+                    	
                 }
             }
             currSelected = null;
@@ -176,8 +175,8 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
 
     //pass in start location of tile, cascade will fill all holes at and above location
     function cascadeFill(column, row) {
-        //removeAllMatches();
-        setTimeout(function(){
+        if(type == "std") {
+            setTimeout(function(){
             //if top row, make new element
             if(row == 0) {
                 //make new random tile at top
@@ -213,6 +212,11 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 return;
             }
             }, 100);
+        }
+        else if (type == "cmbt") {
+            createTile(column, row, Math.round(Math.random()*4));        
+        }
+        
     }
 
     function isAdjacent() {
@@ -332,8 +336,9 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
             completed = true;
             createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
             setTimeout(function(){
-                alert("you win! score: "+stageScore);
-                stateController.getInstance().stageComplete(id, stageScore);
+                createjs.Sound.play("successSound");
+                alert("you win! score: "+(brightness+180*100));
+                stateController.getInstance().stageComplete(id, (brightness+180*100));
                 stateController.getInstance().getNextState();
             }, 2000);
         }

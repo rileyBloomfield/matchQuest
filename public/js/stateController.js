@@ -11,7 +11,8 @@ var stateController = (function() {
 				//search through all completed stages to update score (if better), if not exist, add stage completed
 				for (var i=0; i<state.stages.length; i++) {
 					if(state.stages[i].id == id) {
-						if(stage.stages[i].score < score) {
+						if(state.stages[i].score < score) {
+							$.notify("New high score!", "success");
 							state.stages[i].score = score;
 						}
 						return;
@@ -24,7 +25,6 @@ var stateController = (function() {
 					return net.getMainMenu();
 				}
 				if(!onMap) {
-					//state.stages.push({id: stage, score: score});
 					renderStage(net.getMapMenu());
 				}
 			},
@@ -32,21 +32,25 @@ var stateController = (function() {
 				if(id <= state.stages.length)
 					renderStage(net.getStage(id), id);
 				else {
-					$.notify("You have not completed to this point yet", "error"/*{style: 'happyblue', autoHide: true}*/);
+					$.notify("You have not completed to this point yet", "error");
 				}
 			},
 			loginUser: function(user, pass) {
-				var user = prompt("Please enter your name");
-				var pass = prompt("Please enter your password");
+				var user = $("#inputUser2").val();
+				var pass = $("#inputPassword2").val();
 				if(user && pass) {
 					state = net.loginUser(user, pass);
+					if(state) {
+						this.getNextState();
+					}
 				}
 			},
 			createUser: function(user, pass) {
-				var user = prompt("Please enter your name");
-				var pass = prompt("Please enter your password");
+				var user = $("#inputUser").val();
+				var pass = $("#inputPassword").val();
 				if(user && pass) {
 					state = net.createUser(user, pass);
+					this.getNextState();
 				}
 			}
 		}

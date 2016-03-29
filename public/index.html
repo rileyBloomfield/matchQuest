@@ -28,6 +28,20 @@
     <script src="js/renderStage.js"></script>
     <script src="js/init.js"></script>
 
+    <style>
+.modal-body .form-horizontal .col-sm-2,
+.modal-body .form-horizontal .col-sm-10 {
+    width: 100%
+}
+
+.modal-body .form-horizontal .control-label {
+    text-align: left;
+}
+.modal-body .form-horizontal .col-sm-offset-2 {
+    margin-left: 15px;
+}
+</style>
+
     <title>Match Quest</title>
 </head>
 
@@ -37,6 +51,114 @@
                 <div class="col-lg-2"></div>
                 <div class="col-lg-8">
                         <canvas id="canvas" width="800" height="600"></canvas>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="myModalHorizontal" tabindex="-1" role="dialog" 
+                             aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <button type="button" class="close" 
+                                           data-dismiss="modal">
+                                               <span aria-hidden="true">&times;</span>
+                                               <span class="sr-only">Close</span>
+                                        </button>
+                                        <h4 class="modal-title" id="myModalLabel">
+                                            User Details
+                                        </h4>
+                                    </div>
+                                    
+                                    <!-- Modal Body -->
+                                    <div class="modal-body">
+                                        
+                                        <form class="form-horizontal" role="form">
+                                          <div class="form-group">
+                                            <label  class="col-sm-2 control-label"
+                                                      for="inputUser">User</label>
+                                            <div class="col-sm-10">
+                                                <input type="name" class="form-control" 
+                                                id="inputUser" placeholder="Email"/>
+                                            </div>
+                                          </div>
+                                          <div class="form-group">
+                                            <label class="col-sm-2 control-label"
+                                                  for="inputPassword" >Password</label>
+                                            <div class="col-sm-10">
+                                                <input type="password" class="form-control"
+                                                    id="inputPassword" placeholder="Password"/>
+                                            </div>
+                                          </div>
+
+                                          <div class="form-group">
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                              <button type="submit" class="btn btn-default" data-dismiss="modal" onclick="stateController.getInstance().createUser();">Submit</button>
+                                            </div>
+                                          </div>
+                                        </form>
+
+                                    </div>
+                                    
+                                    <!-- Modal Footer -->
+                                    <div class="modal-footer">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="myModalVertical" tabindex="-1" role="dialog" 
+                             aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <button type="button" class="close" 
+                                           data-dismiss="modal">
+                                               <span aria-hidden="true">&times;</span>
+                                               <span class="sr-only">Close</span>
+                                        </button>
+                                        <h4 class="modal-title" id="myModalLabel">
+                                            User Details
+                                        </h4>
+                                    </div>
+                                    
+                                    <!-- Modal Body -->
+                                    <div class="modal-body">
+                                        
+                                        <form class="form-horizontal" role="form">
+                                          <div class="form-group">
+                                            <label  class="col-sm-2 control-label"
+                                                      for="inputUser2">User</label>
+                                            <div class="col-sm-10">
+                                                <input type="name" class="form-control" 
+                                                id="inputUser2" placeholder="Email"/>
+                                            </div>
+                                          </div>
+                                          <div class="form-group">
+                                            <label class="col-sm-2 control-label"
+                                                  for="inputPassword2" >Password</label>
+                                            <div class="col-sm-10">
+                                                <input type="password" class="form-control"
+                                                    id="inputPassword2" placeholder="Password"/>
+                                            </div>
+                                          </div>
+
+                                          <div class="form-group">
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                              <button type="submit" class="btn btn-default" data-dismiss="modal" onclick="stateController.getInstance().loginUser();">Submit</button>
+                                            </div>
+                                          </div>
+                                        </form>
+
+                                    </div>
+                                    
+                                    <!-- Modal Footer -->
+                                    <div class="modal-footer">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                 </div>
                 <div class="col-lg-2"></div>
             </div>
