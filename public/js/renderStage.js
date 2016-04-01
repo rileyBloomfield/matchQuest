@@ -31,7 +31,7 @@ function renderStage(params, id) {
 
     //render icon container
     if(params.iconContainer) {
-    	var matchPuzzle = new puzzle(canvas, params.iconContainer.iconData, params.iconContainer.grid, params.iconContainer.numMoves, backgroundBitmap, params.iconContainer.iconSize, params.iconContainer.goal, id, params.type, params.opponent);
+    	var matchPuzzle = new puzzle(canvas, params.iconContainer.iconData, params.iconContainer.grid, params.iconContainer.numMoves, backgroundBitmap, params.iconContainer.iconSize, params.iconContainer.goal, id, params.type, params.opponent, params.self);
     }
 };
 

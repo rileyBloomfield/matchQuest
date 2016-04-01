@@ -1,4 +1,4 @@
-var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal, id, type, opponent) {
+var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal, id, type, opponent, self) {
 	//Holders for matching
     var prevSelected = null,
         currSelected = null;
@@ -137,12 +137,13 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 resourceLabels.push(text);
                 statusContainer.addChild(text);
 
-                var spriteSheet = new createjs.SpriteSheet(iconData[0]);
-                var icon = new createjs.Sprite(spriteSheet);
-                icon.x = 160;
-                icon.scaleY = 0.75;
-                icon.scaleX = 0.75;
-                statusContainer.addChild(icon);
+                var img = new Image();
+                img.src = self;
+                var bitmap = new createjs.Bitmap(img);
+                bitmap.scaleY = 0.75;
+                bitmap.scaleX = 0.75;
+                bitmap.x = 160;
+                statusContainer.addChild(bitmap);
 
                 var text = new createjs.Text(health+"/100", "20px Arial", "#ff7700");
                 text.x = 160;
@@ -158,10 +159,24 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         //removeAllMatches();
     }
 
+    function flashStatusAction(pos, type) {
+        var spriteSheet = new createjs.SpriteSheet(iconData[type]);
+        var icon = new createjs.Sprite(spriteSheet);
+        icon.x = 80*pos;
+        icon.scaleY = 0.75;
+        icon.scaleX = 0.75;
+        statusContainer.addChild(icon);
+
+        createjs.Tween.get(icon, { loop: false }).to({ alpha: 1 }, 500).call(function(icon, statusContainer) {
+            statusContainer.removeChild(icon);
+        }, [icon, statusContainer], this);
+    }
+
     function handleClick(icon) {
         //if combat, chance of attack on every click
         if(type == "cmbt") {
             if(Math.round(Math.random()*5) == 2) {
+                flashStatusAction(2,5);
                 health -= 10;
                 changeText(resourceLabels[1], health+"/100", 1);
                 if (health <= 0 && !completed) {
@@ -174,6 +189,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 }
             }
             if(Math.round(Math.random()*25) == 3) {
+                flashStatusAction(0,6);
                 if (oppHealth <= 90)
                     oppHealth += 10;
                 changeText(resourceLabels[0], oppHealth+"/100", 0);
@@ -424,6 +440,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         }
         if (type == "cmbt") {
             if(index == 0) { //attack tile is matched
+                flashStatusAction(0,5);
                 oppHealth -= 10;
                 changeText(resourceLabels[index], oppHealth+"/100", index);
                 if (oppHealth <= 0 && !completed) {
@@ -438,6 +455,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 }
             }
             if (index == 1) { //health tile is matched
+                flashStatusAction(2,6);
                 if (health <= 90)
                     health += 10;
                 changeText(resourceLabels[index], health+"/100", index);

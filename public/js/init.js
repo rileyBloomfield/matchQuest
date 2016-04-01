@@ -2,12 +2,12 @@ var canvas;
 var queue;
 
 function init() {
-	//canvas = new createjs.Stage("canvas");
-	//canvas.enableMouseOver();
-	//createjs.Ticker.setFPS(30);
-	//createjs.Ticker.addEventListener("tick", function() {
-  //      canvas.update();
-  //});
+	canvas = new createjs.Stage("canvas");
+	canvas.enableMouseOver();
+	createjs.Ticker.setFPS(30);
+	createjs.Ticker.addEventListener("tick", function() {
+       canvas.update();
+  });
 
   var controller = stateController.getInstance();
   renderStage(controller.getNextState());
