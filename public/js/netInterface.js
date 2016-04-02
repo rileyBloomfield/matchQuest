@@ -70,13 +70,7 @@ var stageData = {
         src: "res/buttons/backButton.png",
         x: 700,
         y: 0,
-        handler: function() {
-          var r = confirm("Are you sure you want to exit?");
-          if (r == true) {
-              location.reload();
-          } else {
-              
-          }}
+        handler: function() { $('#exitModal').modal('show'); }
     }, {
         src: "res/buttons/playButton.png",
         x: 240,
@@ -102,14 +96,7 @@ var stageData = {
         src: "res/buttons/backButton.png",
         x: 700,
         y: 0,
-        handler: function() {
-          var r = confirm("Are you sure you want to exit?");
-          if (r == true) {
-              stateController.getInstance().getNextState();
-          } else {
-              
-          }}
-    }],
+        handler: function() { $('#confirmModal').modal('show'); } }],
     iconContainer: {
       iconData: ["icons/logSprite.png",
                  "icons/waterSprite.png",
@@ -135,14 +122,7 @@ var stageData = {
         src: "res/buttons/backButton.png",
         x: 700,
         y: 0,
-        handler: function() {
-          var r = confirm("Are you sure you want to exit?");
-          if (r == true) {
-              stateController.getInstance().getNextState();
-          } else {
-              
-          }}
-    }],
+        handler: function() {$('#confirmModal').modal('show'); }}],
     opponent: "res/opponents/eel.jpg",
     self: "res/opponents/self.jpg",
     iconContainer: {
@@ -172,14 +152,7 @@ var stageData = {
         src: "res/buttons/backButton.png",
         x: 700,
         y: 0,
-        handler: function() {
-          var r = confirm("Are you sure you want to exit?");
-          if (r == true) {
-              stateController.getInstance().getNextState();
-          } else {
-              
-          }}
-    }],
+        handler: function() {$('#confirmModal').modal('show'); }}],
     opponent: "res/opponents/toxic.png",
     self: "res/opponents/bridge.png",
     iconContainer: {

@@ -159,7 +159,46 @@
                                 </div>
                             </div>
                         </div>
-                </div>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" 
+                             aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- Modal Body -->
+                                    <div class="modal-body">
+                                        Are you sure you want to exit?
+                                    </div>
+                                    
+                                    <!-- Modal Footer -->
+                                    <div class="modal-footer">
+                                        <button type="button" data-dismiss="modal" class="btn btn-primary" onclick="stateController.getInstance().getNextState();">Yes</button>
+                                        <button type="button" data-dismiss="modal" class="btn">No</button>
+                                      </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exitModal" tabindex="-1" role="dialog" 
+                             aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- Modal Body -->
+                                    <div class="modal-body">
+                                        Are you sure you want to exit?
+                                    </div>
+                                    
+                                    <!-- Modal Footer -->
+                                    <div class="modal-footer">
+                                        <button type="button" data-dismiss="modal" class="btn btn-primary" onclick="location.reload();">Yes</button>
+                                        <button type="button" data-dismiss="modal" class="btn">No</button>
+                                      </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                 <div class="col-lg-2"></div>
             </div>
         </div>
