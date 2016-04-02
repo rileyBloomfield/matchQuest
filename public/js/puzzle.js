@@ -1,4 +1,4 @@
-var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal, id, type, opponent, self) {
+var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal, id, type, opponent, self, goalGrid) {
 	//Holders for matching
     var prevSelected = null,
         currSelected = null;
@@ -9,7 +9,8 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
     var goalMatches = [0,0,0,0,0];
     var stageScore = 0;
     var health = 100,
-        oppHealth = 100;
+        oppHealth = 100,
+        countedMatch = false;
 
 	//Container to hold icons together
     var iconContainer = new createjs.Container();
@@ -30,6 +31,14 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                  [0,0,0,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0]];
 
+    var completedBridge  =  [[0,0,0,0,0,0,0,0],
+                             [0,0,0,0,0,0,0,0],
+                             [0,0,0,0,0,0,0,0],
+                             [0,0,0,0,0,0,0,0],
+                             [0,0,0,0,0,0,0,0],
+                             [0,0,0,0,0,0,0,0],
+                             [0,0,0,0,0,0,0,0],
+                             [0,0,0,0,0,0,0,0]];
 
 
     var resourceLabels = [];
@@ -67,7 +76,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         icon.y = yPos * iconSize;
         //console.log("Icon created at "+xPos+", "+yPos+" type: "+type);
         iconContainer.addChild(icon);
-        createjs.Tween.get(icon, { loop: false }).to({ alpha: 1 }, 500);
+        createjs.Tween.get(icon, { loop: false }).to({ alpha: 1 }, 750);
         tiles[xPos][yPos] = icon;
         removeMatches(icon);
     }
@@ -90,6 +99,17 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
     function init() {
         stage.removeChild(iconContainer);
         iconContainer.removeAllChildren();
+
+        if (type == "boss") {
+            goalGrid.forEach(function(result, row) {
+            result.forEach(function(value, index) {
+                if(value == 1) {
+                    drawBridge(index, row, opponent);
+                }
+            });
+        });
+        }
+
         //Add All Icons to Stage
         grid.forEach(function(result, row) {
             result.forEach(function(column, index) {
@@ -159,6 +179,17 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         //removeAllMatches();
     }
 
+    function drawBridge(xPos, yPos, status) {
+        var img = new Image();
+        img.src = status;
+        var bitmap = new createjs.Bitmap(img);
+        bitmap.scaleY = 0.5;
+        bitmap.scaleX = 0.5;
+        bitmap.x = xPos * 55;
+        bitmap.y = yPos * 55;
+        iconContainer.addChild(bitmap);
+    }
+
     function flashStatusAction(pos, type) {
         var spriteSheet = new createjs.SpriteSheet(iconData[type]);
         var icon = new createjs.Sprite(spriteSheet);
@@ -183,7 +214,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                     completed = true;
                     createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
                     setTimeout(function() {
-                        alert("You lose");
+                        alert("You must retreat to safety. Try again after resting.");
                         stateController.getInstance().getNextState();
                     }, 2000);
                 }
@@ -201,7 +232,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
 
             //Selected icons are adjacent, make the move
             if (isAdjacent()) {
-
+                countedMatch = false;
                 //swap icon position attributes
                 var tempXPos = currSelected.xPos,
                     tempYPos = currSelected.yPos;
@@ -236,7 +267,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
     }
 
     //pass in start location of tile, cascade will fill all holes at and above location
-    function cascadeFill(column, row) {
+    function cascadeFill(column, row, tileType) {
         if(type == "std") {
             setTimeout(function(){
             //if top row, make new element
@@ -277,6 +308,23 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         }
         else if (type == "cmbt") {
             createTile(column, row, Math.round(Math.random()*4));        
+        }
+        else if (type == "boss") {
+            if (goalGrid[row][column] != 1) {
+                //increased chance of getting type 0 on fill
+                var rand = Math.round(Math.random()*6);
+                if (rand > 4)
+                    rand = 0
+                createTile(column, row, rand);
+            }
+            else {
+                if (tileType != 0)
+                   createTile(column, row, Math.round(Math.random()*4));
+                else {
+                    drawBridge(column, row, self); 
+                    completedBridge[row][column] = 1;
+                }
+            }                
         }
         
     }
@@ -334,8 +382,8 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         }
 
         if(matchLength >= 3) {
-            console.log("Matched "+matchLength+" tile type "+currMatch[0].type);
             countMatch(currMatch[0].type);
+            currMatch.type = currMatch[0].type;
             matches.push(currMatch);
         }
 
@@ -369,8 +417,8 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         }
 
         if(matchLength >= 3) {
-            console.log("Matched "+matchLength+" tile type "+currMatch[0].type);
             countMatch(currMatch[0].type);
+            currMatch.type = currMatch[0].type;
             matches.push(currMatch);
         }
 
@@ -379,6 +427,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
 
         var lastMatch = [];
         lastMatch.push(tiles[icon.xPos][icon.yPos]);
+        lastMatch.type = tiles[icon.xPos][icon.yPos].type;
         matches.push(lastMatch);
 
         //if there are matches, delete the tiles in the matches
@@ -391,7 +440,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         //call cascade fill on all tiles removed
         matches.forEach(function(matchSet){
             matchSet.forEach(function(icon) {
-                cascadeFill(icon.xPos, icon.yPos);
+                cascadeFill(icon.xPos, icon.yPos, matchSet.type);
             });
         })
         if(checkWin() && !completed) {
@@ -399,7 +448,12 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
             createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
             setTimeout(function(){
                 createjs.Sound.play("successSound");
-                alert("you win! score: "+(brightness+180*100));
+                if (type == "boss") {
+                    alert("You have escaped the crash site, continue your journey!");
+                }
+                if (type == "std") {
+                    alert("you win! score: "+(brightness+180*100));
+                }
                 stateController.getInstance().stageComplete(id, (brightness+180*100));
                 stateController.getInstance().getNextState();
             }, 2000);
@@ -418,14 +472,24 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
             completed = true;
             createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
             setTimeout(function() {
-                alert("You lose");
+                alert("It's too dark to make it safely, try again in the morning.");
                 stateController.getInstance().getNextState();
             }, 2000);
         }
     }
 
     function checkWin() {
-        console.log(goalMatches);
+        if(type == "boss") {
+            //check if bridge has been completed
+            var isDone = true;
+            goalGrid.forEach(function(result, row){
+                result.forEach(function(item, column){
+                    if(item != completedBridge[row][column])
+                        isDone = false;
+                });
+            });
+            return isDone;
+        }
         for(var i=0; i<goal.length; i++) {
             if(goalMatches[i] < goal[i])
                 return false;
@@ -435,8 +499,11 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
 
     function countMatch(index) {
         if (type == "std") {
-            goalMatches[index]++;
-            changeText(resourceLabels[index], goalMatches[index]+"/"+goal[index], index);
+            if(!countedMatch) {
+                countedMatch = true;
+                goalMatches[index]++;
+                changeText(resourceLabels[index], goalMatches[index]+"/"+goal[index], index);
+            }
         }
         if (type == "cmbt") {
             if(index == 0) { //attack tile is matched

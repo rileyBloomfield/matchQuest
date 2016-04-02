@@ -64,8 +64,20 @@ var stageData = {
     iconContainer: false
   }, 
   map: {
+    type: 'map',
     backgroundSrc: "res/backgrounds/mapMenu.gif",
     buttons: [{
+        src: "res/buttons/backButton.png",
+        x: 700,
+        y: 0,
+        handler: function() {
+          var r = confirm("Are you sure you want to exit?");
+          if (r == true) {
+              location.reload();
+          } else {
+              
+          }}
+    }, {
         src: "res/buttons/playButton.png",
         x: 240,
         y: 450,
@@ -86,7 +98,18 @@ var stageData = {
   stages: [{
     backgroundSrc: "res/backgrounds/stdBackground.jpg",
     type: "std",
-    buttons: [],
+    buttons: [{
+        src: "res/buttons/backButton.png",
+        x: 700,
+        y: 0,
+        handler: function() {
+          var r = confirm("Are you sure you want to exit?");
+          if (r == true) {
+              stateController.getInstance().getNextState();
+          } else {
+              
+          }}
+    }],
     iconContainer: {
       iconData: ["icons/logSprite.png",
                  "icons/waterSprite.png",
@@ -108,15 +131,26 @@ var stageData = {
   }, {
     backgroundSrc: "res/backgrounds/cmbtBackground.jpg",
     type: "cmbt",
-    buttons: [],
+    buttons: [{
+        src: "res/buttons/backButton.png",
+        x: 700,
+        y: 0,
+        handler: function() {
+          var r = confirm("Are you sure you want to exit?");
+          if (r == true) {
+              stateController.getInstance().getNextState();
+          } else {
+              
+          }}
+    }],
     opponent: "res/opponents/eel.jpg",
     self: "res/opponents/self.jpg",
     iconContainer: {
       iconData: ["icons/attack.png",
                  "icons/health.png",
-                 "icons/sunSprite.png",
-                 "icons/moonSprite.png",
-                 "icons/flowerSprite.png",
+                 "icons/coralSprite.png",
+                 "icons/seaRockSprite.png",
+                 "icons/seaweedSprite.png",
                  "icons/attackEmpty.png",
                  "icons/healthEmpty.png"],
       grid: [[1,2,1,1,2,1,0,1],
@@ -134,7 +168,20 @@ var stageData = {
   }, {
     backgroundSrc: "res/backgrounds/bossBackground.jpg",
     type: "boss",
-    buttons: [],
+    buttons: [{
+        src: "res/buttons/backButton.png",
+        x: 700,
+        y: 0,
+        handler: function() {
+          var r = confirm("Are you sure you want to exit?");
+          if (r == true) {
+              stateController.getInstance().getNextState();
+          } else {
+              
+          }}
+    }],
+    opponent: "res/opponents/toxic.png",
+    self: "res/opponents/bridge.png",
     iconContainer: {
       iconData: ["icons/logSprite.png",
                  "icons/waterSprite.png",
@@ -149,9 +196,17 @@ var stageData = {
              [0,3,0,0,2,3,1,0],
              [2,2,1,0,3,1,0,0],
              [0,4,0,1,0,4,1,1]],
-      numMoves: 25,
+      numMoves: 100,
       iconSize: 55,
-      goal: [20, 20, 20, 20, 20]
+      goal: [20, 20, 20, 20, 20],
+      goalGrid: [[0,0,0,0,0,0,1,0],
+                 [0,0,0,0,1,1,1,0],
+                 [1,1,1,1,1,0,0,0],
+                 [1,0,0,0,0,0,0,0],
+                 [1,1,0,0,0,0,0,0],
+                 [0,1,0,0,0,0,0,0],
+                 [0,1,0,0,0,0,0,0],
+                 [0,1,0,0,0,0,0,0]]
     }
   }]
 };

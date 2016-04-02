@@ -29,11 +29,17 @@ var stateController = (function() {
 				}
 			},
 			getStage: function(id) {
-				if(id <= state.stages.length)
+				if(stateController.getInstance().checkIfStageAvailable(id))
 					renderStage(net.getStage(id), id);
 				else {
 					$.notify("You have not completed to this point yet", "error");
 				}
+			},
+			checkIfStageAvailable: function(id) {
+				return (id <= state.stages.length);
+			},
+			getStageNumber: function() {
+				return state.stages.length;
 			},
 			loginUser: function(user, pass) {
 				var user = $("#inputUser2").val();
