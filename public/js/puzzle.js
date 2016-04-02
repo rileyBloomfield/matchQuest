@@ -269,7 +269,6 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
     //pass in start location of tile, cascade will fill all holes at and above location
     function cascadeFill(column, row, tileType) {
         if(type == "std") {
-            setTimeout(function(){
             //if top row, make new element
             if(row == 0) {
                 //make new random tile at top
@@ -304,7 +303,6 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 cascadeFill(column, row-1);
                 return;
             }
-            }, 100);
         }
         else if (type == "cmbt") {
             createTile(column, row, Math.round(Math.random()*4));        
