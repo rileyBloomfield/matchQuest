@@ -62,13 +62,10 @@ function renderStage(params, id) {
             }
         })
     }
-    
-console.log(stateController.getInstance().difficultyMod);
-
 
     //render icon container
     if(params.iconContainer) {
-    	var matchPuzzle = new puzzle(canvas, params.iconContainer.iconData, params.iconContainer.grid, params.iconContainer.numMoves, backgroundBitmap, params.iconContainer.iconSize, params.iconContainer.goal, id, params.type, params.opponent, params.self, params.iconContainer.goalGrid);
+    	var matchPuzzle = new puzzle(canvas, params.iconContainer.iconData, params.iconContainer.grid, params.iconContainer.numMoves, backgroundBitmap, params.iconContainer.iconSize, params.iconContainer.goal, id, params.type, params.opponent, params.self, params.iconContainer.goalGrid, params.iconContainer.instruction);
     }
 };
 

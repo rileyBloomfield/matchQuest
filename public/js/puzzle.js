@@ -1,4 +1,4 @@
-var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal, id, type, opponent, self, goalGrid) {
+var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, goal, id, type, opponent, self, goalGrid, instruction) {
 	//Holders for matching
     var prevSelected = null,
         currSelected = null;
@@ -173,6 +173,16 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 statusContainer.addChild(text);
 
         }
+
+        //draw instuction panel
+        var img = new Image();
+        img.src = instruction;
+        var instBitmap = new createjs.Bitmap(img);
+        instBitmap.scaleY = 1;
+        instBitmap.scaleX = 1;
+        instBitmap.x = 485;
+        instBitmap.y = 70;
+        stage.addChild(instBitmap);
 
         stage.addChild(statusContainer);
         stage.addChild(clockContainer);

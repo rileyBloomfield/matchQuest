@@ -128,7 +128,8 @@ var stageData = {
              [0,4,0,1,0,4,1,1]],
       numMoves: 25,
       iconSize: 55,
-      goal: [2, 2, 2, 2, 2]
+      goal: [2, 2, 2, 2, 2], 
+      instruction: "res/instructions/instruction.png"
     }
   }, {
     backgroundSrc: "res/backgrounds/cmbtBackground.jpg",
@@ -158,7 +159,8 @@ var stageData = {
              [0,4,0,1,0,4,1,1]],
       numMoves: 25,
       iconSize: 55,
-      goal: [20, 20, 20, 20, 20]
+      goal: [20, 20, 20, 20, 20], 
+      instruction: "res/instructions/instruction.png"
     }
   }, {
     backgroundSrc: "res/backgrounds/bossBackground.jpg",
@@ -187,6 +189,7 @@ var stageData = {
       numMoves: 140,
       iconSize: 55,
       goal: [20, 20, 20, 20, 20],
+      instruction: "res/instructions/instruction.png",
       goalGrid: [[0,0,0,0,0,0,1,0],
                  [0,0,0,0,1,1,1,0],
                  [1,1,1,1,1,0,0,0],
