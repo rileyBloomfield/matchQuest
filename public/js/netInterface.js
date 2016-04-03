@@ -72,6 +72,11 @@ var stageData = {
         y: 0,
         handler: function() { $('#exitModal').modal('show'); }
     }, {
+        src: "res/buttons/nextMapButton.png",
+        x: 700,
+        y: 555,
+        handler: function() { alert(""); }
+    }, {
         src: "res/buttons/playButton.png",
         x: 240,
         y: 450,
@@ -87,7 +92,17 @@ var stageData = {
         y: 150,
         handler: function() {stateController.getInstance().getStage(2);}
     }],
-    iconContainer: false
+    iconContainer: false,
+    scores: [{
+      x: 230,
+      y: 560
+    }, {
+      x: 290,
+      y: 340
+    }, {
+      x: 610,
+      y: 260
+    }]
   },
   stages: [{
     backgroundSrc: "res/backgrounds/stdBackground.jpg",
@@ -169,7 +184,7 @@ var stageData = {
              [0,3,0,0,2,3,1,0],
              [2,2,1,0,3,1,0,0],
              [0,4,0,1,0,4,1,1]],
-      numMoves: 100,
+      numMoves: 140,
       iconSize: 55,
       goal: [20, 20, 20, 20, 20],
       goalGrid: [[0,0,0,0,0,0,1,0],
@@ -189,10 +204,13 @@ var users = [{
   pass: "pass",
   stages: [{
     id: 0,
-    score: 12345
+    score: 1111
   }, {
     id: 1,
-    score: 12345
+    score: 2222
+  } , {
+    id: 2,
+    score: 3333
   }]
 }]
 

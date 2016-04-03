@@ -30,7 +30,7 @@ function renderStage(params, id) {
     }
     else {
         params.buttons.forEach(function(button, index) {
-            if(index < (2+stateController.getInstance().getStageNumber())) {
+            if(index < (3+stateController.getInstance().getStageNumber())) {
                 var buttonData = {
                   images: [button.src],
                   frames: {width:100, height:45},
@@ -51,8 +51,19 @@ function renderStage(params, id) {
             }
         })  
     }
+    if(params.scores) {
+        params.scores.forEach(function(score, index) {
+            if(stateController.getInstance().getStageScore(index) !=0) {
+                var text = new createjs.Text("Score: "+stateController.getInstance().getStageScore(index), "20px Arial", "#663300");
+                text.x = score.x;
+                text.y = score.y;
+                text.textBaseline = "alphabetic";
+                canvas.addChild(text);   
+            }
+        })
+    }
     
-
+console.log(stateController.getInstance().difficultyMod);
 
 
     //render icon container

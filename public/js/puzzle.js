@@ -10,7 +10,8 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
     var stageScore = 0;
     var health = 100,
         oppHealth = 100,
-        countedMatch = false;
+        countedMatch = false, 
+        usedMoves = 0;
 
 	//Container to hold icons together
     var iconContainer = new createjs.Container();
@@ -214,8 +215,9 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                     completed = true;
                     createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
                     setTimeout(function() {
-                        $('#insertText').html("You must retreat to safety. Try again after resting.");
+                        $('#insertText').html("Your health has been depleted and you must retreat to safety. Try again after resting. (Don't forget to match health tiles!)");
                         $('#finishModal').modal('show');
+                        stateController.getInstance().difficultyMod++;
                     }, 2000);
                 }
             }
@@ -229,6 +231,15 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         }
         if(prevSelected) {
             currSelected = icon;
+
+            //double click on tile to fix getting stuck on boss stage
+            if(type == "boss") {
+                if(prevSelected == currSelected) {
+                    deleteTile(tiles[prevSelected.xPos][prevSelected.yPos]);
+                    createTile(prevSelected.xPos, prevSelected.yPos, Math.round(Math.random()*4));
+                    lowerBrightness();
+                }
+            }
 
             //Selected icons are adjacent, make the move
             if (isAdjacent()) {
@@ -256,6 +267,9 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                     createjs.Sound.play("alertSound");
                     if(type != "cmbt") {
                         lowerBrightness();
+                    }
+                    else {
+                        usedMoves++;
                     }                    	
                 }
             }
@@ -306,12 +320,15 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
             }
         }
         else if (type == "cmbt") {
-            createTile(column, row, Math.round(Math.random()*4));        
+            var rand = Math.round(Math.random()*(4+stateController.getInstance().difficultyMod));
+                if (rand > 4)
+                    rand = 0
+                createTile(column, row, rand);       
         }
         else if (type == "boss") {
             if (goalGrid[row][column] != 1) {
-                //increased chance of getting type 0 on fill
-                var rand = Math.round(Math.random()*6);
+                //increased chance of getting type 0 on fill, modified by difficulty modifier
+                var rand = Math.round(Math.random()*(6+stateController.getInstance().difficultyMod));
                 if (rand > 4)
                     rand = 0
                 createTile(column, row, rand);
@@ -451,10 +468,11 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                     $('#insertText').html('You have escaped the crash site, continue your journey!');
                 }
                 if (type == "std") {
-                    $('#insertText').html('you win! score: '+(brightness+180*100));
+                    $('#insertText').html('You win! score: ' + (Math.floor(brightness+180*100)));
                 }
                 $('#finishModal').modal('show');
-                stateController.getInstance().stageComplete(id, (brightness+180*100));
+                stateController.getInstance().stageComplete(id, Math.floor(brightness+180*100));
+                stateController.getInstance().difficultyMod = 0;
             }, 2000);
         }
         return true;
@@ -473,6 +491,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
             setTimeout(function() {
                 $('#insertText').html("It's too dark to make it safely, try again in the morning.");
                 $('#finishModal').modal('show');
+                stateController.getInstance().difficultyMod++;
             }, 2000);
         }
     }
@@ -487,6 +506,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                         isDone = false;
                 });
             });
+            stateController.getInstance().difficultyMod = 0;
             return isDone;
         }
         for(var i=0; i<goal.length; i++) {
@@ -516,7 +536,8 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                         createjs.Sound.play("successSound");
                         $('#insertText').html("You have defeated the opponent!");
                         $('#finishModal').modal('show');
-                        stateController.getInstance().stageComplete(id, 12345);
+                        stateController.getInstance().difficultyMod++;
+                        stateController.getInstance().stageComplete(id, Math.floor(1/usedMoves*10000*health));
                     }, 2000);
                 }
             }

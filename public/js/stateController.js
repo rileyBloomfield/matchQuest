@@ -3,10 +3,12 @@ var stateController = (function() {
 	function init() {
 		var state,
 			net,
-			onMap = false;
+			onMap = false,
+			difficultyMod = 0;
 		net = netInterface.getInstance();
 
 		return {
+			difficultyMod: difficultyMod,
 			stageComplete: function(id, score) {
 				//search through all completed stages to update score (if better), if not exist, add stage completed
 				for (var i=0; i<state.stages.length; i++) {
@@ -40,6 +42,12 @@ var stateController = (function() {
 			},
 			getStageNumber: function() {
 				return state.stages.length;
+			},
+			getStageScore: function(id) {
+				if(state.stages[id] !== undefined)
+					return state.stages[id].score;
+				else
+					return 0;
 			},
 			loginUser: function(user, pass) {
 				var user = $("#inputUser2").val();
