@@ -214,8 +214,8 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                     completed = true;
                     createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
                     setTimeout(function() {
-                        alert("You must retreat to safety. Try again after resting.");
-                        stateController.getInstance().getNextState();
+                        $('#insertText').html("You must retreat to safety. Try again after resting.");
+                        $('#finishModal').modal('show');
                     }, 2000);
                 }
             }
@@ -232,7 +232,6 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
 
             //Selected icons are adjacent, make the move
             if (isAdjacent()) {
-                countedMatch = false;
                 //swap icon position attributes
                 var tempXPos = currSelected.xPos,
                     tempYPos = currSelected.yPos;
@@ -250,7 +249,9 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 createjs.Tween.get(prevSelected, { loop: false }).to({ x: currSelected.x, y: currSelected.y }, 500, createjs.Ease.getPowInOut(6));
 
                 function handleNextIcon(currSelected, prevSelected) {
+                    countedMatch = false;
                     removeMatches(prevSelected)
+                    countedMatch = false;
                     removeMatches(currSelected)
                     createjs.Sound.play("alertSound");
                     if(type != "cmbt") {
@@ -447,13 +448,13 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
             setTimeout(function(){
                 createjs.Sound.play("successSound");
                 if (type == "boss") {
-                    alert("You have escaped the crash site, continue your journey!");
+                    $('#insertText').html('You have escaped the crash site, continue your journey!');
                 }
                 if (type == "std") {
-                    alert("you win! score: "+(brightness+180*100));
+                    $('#insertText').html('you win! score: '+(brightness+180*100));
                 }
+                $('#finishModal').modal('show');
                 stateController.getInstance().stageComplete(id, (brightness+180*100));
-                stateController.getInstance().getNextState();
             }, 2000);
         }
         return true;
@@ -470,8 +471,8 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
             completed = true;
             createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
             setTimeout(function() {
-                alert("It's too dark to make it safely, try again in the morning.");
-                stateController.getInstance().getNextState();
+                $('#insertText').html("It's too dark to make it safely, try again in the morning.");
+                $('#finishModal').modal('show');
             }, 2000);
         }
     }
@@ -513,9 +514,9 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                     createjs.Tween.get(iconContainer, { loop: false }).to({ alpha: 0 }, 2000);
                     setTimeout(function(){
                         createjs.Sound.play("successSound");
-                        alert("you have defeated the oppnent!");
+                        $('#insertText').html("You have defeated the opponent!");
+                        $('#finishModal').modal('show');
                         stateController.getInstance().stageComplete(id, 12345);
-                        stateController.getInstance().getNextState();
                     }, 2000);
                 }
             }

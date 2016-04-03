@@ -40,6 +40,22 @@
 .modal-body .form-horizontal .col-sm-offset-2 {
     margin-left: 15px;
 }
+
+.modal-backdrop {
+   background-color: #000000;
+}
+
+.modal-header {
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #d2a679;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+ }
 </style>
 
     <title>Match Quest</title>
@@ -193,6 +209,40 @@
                                     <div class="modal-footer">
                                         <button type="button" data-dismiss="modal" class="btn btn-primary" onclick="location.reload();">Yes</button>
                                         <button type="button" data-dismiss="modal" class="btn">No</button>
+                                      </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="finishModal" tabindex="-1" role="dialog" 
+                             aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- Modal Body -->
+                                    <div class="modal-body" id="insertText">
+                                    </div>
+                                    
+                                    <!-- Modal Footer -->
+                                    <div class="modal-footer">
+                                        <button type="button" data-dismiss="modal" class="btn btn-primary" onclick="stateController.getInstance().getNextState();">Ok</button>
+                                      </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="storyModal" tabindex="-1" role="dialog" 
+                             aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- Modal Body -->
+                                    <div class="modal-body" id="insertStory">
+                                    </div>
+                                    
+                                    <!-- Modal Footer -->
+                                    <div class="modal-footer">
+                                        <button type="button" data-dismiss="modal" class="btn btn-primary">Ok</button>
                                       </div>
                                 </div>
                             </div>
