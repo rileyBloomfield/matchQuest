@@ -61,11 +61,6 @@ var stageData = {
         x: 350,
         y: 400,
         handler: function() {$('#myModalVertical').modal('show'); stateController.getInstance().getNextState();}
-    }, {
-        src: "res/buttons/optionsButton.png",
-        x: 350,
-        y: 500,
-        handler: function() {}
     }],
     iconContainer: false
   }, 
