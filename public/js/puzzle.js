@@ -560,6 +560,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         if (type == "cmbt") {
             removeInstruction();
             if(index == 0) { //attack tile is matched
+                createjs.Sound.play("alertSound");
                 flashStatusAction(0,5);
                 oppHealth -= 10;
                 changeText(resourceLabels[index], oppHealth+"/100", index);
@@ -576,6 +577,7 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 }
             }
             if (index == 1) { //health tile is matched
+                createjs.Sound.play("alertSound");
                 flashStatusAction(2,6);
                 if (health <= 90)
                     health += 10;
