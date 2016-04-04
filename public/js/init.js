@@ -23,23 +23,7 @@ function init() {
    ]);
 
    function handleComplete() {
-       createjs.Sound.play("ambientSound", loop=true);
-       //var image = queue.getResult("mainMenu");
+       createjs.Sound.play("ambientSound", {loop:10});
    }
 }
-
-$.notify.addStyle('happyblue', {
-  html: "<div>☺<span data-notify-text/>☺</div>",
-  classes: {
-    base: {
-      "white-space": "nowrap",
-      "background-color": "lightblue",
-      "padding": "5px"
-    },
-    superblue: {
-      "color": "white",
-      "background-color": "blue"
-    }
-  }
-});
 
