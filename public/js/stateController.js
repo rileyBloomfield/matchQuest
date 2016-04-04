@@ -31,8 +31,11 @@ var stateController = (function() {
 				}
 			},
 			getStage: function(id) {
-				if(stateController.getInstance().checkIfStageAvailable(id))
+				if(stateController.getInstance().checkIfStageAvailable(id)) {
+					$('#insertStory').html(net.getStory(id));
+					$('#storyModal').modal('show');
 					renderStage(net.getStage(id), id);
+				}
 				else {
 					$.notify("You have not completed to this point yet", "error");
 				}
@@ -65,6 +68,8 @@ var stateController = (function() {
 				if(user && pass) {
 					state = net.createUser(user, pass);
 					this.getNextState();
+					$('#insertStory').html(net.getStory(-1));
+					$('#storyModal').modal('show');
 				}
 			}
 		}
