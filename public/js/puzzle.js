@@ -6,12 +6,15 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
     var completed = false;
 
     var brightness = 0;
-    var goalMatches = [0,0,0,0,0];
+    var goalMatches = [0,0,0,0,0],
+        totalMatches = 0;
     var stageScore = 0;
     var health = 100,
         oppHealth = 100,
         countedMatch = false, 
-        usedMoves = 0;
+        usedMoves = 0,
+        instBitmap,
+        instructionShow = true;
 
 	//Container to hold icons together
     var iconContainer = new createjs.Container();
@@ -177,17 +180,32 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
         //draw instuction panel
         var img = new Image();
         img.src = instruction;
-        var instBitmap = new createjs.Bitmap(img);
+        instBitmap = new createjs.Bitmap(img);
         instBitmap.scaleY = 1;
         instBitmap.scaleX = 1;
         instBitmap.x = 485;
         instBitmap.y = 70;
-        stage.addChild(instBitmap);
 
+        stage.addChild(instBitmap);
         stage.addChild(statusContainer);
         stage.addChild(clockContainer);
 
         //removeAllMatches();
+    }
+
+    function removeInstruction() {
+        var thresh = 3;
+        if(type == 'cmbt')
+            thresh = 5;
+        if(++totalMatches > thresh && instructionShow) {
+            instructionShow = false;
+            createjs.Tween.get(instBitmap, { loop: false }).to({ alpha: 0 }, 2000);
+            setTimeout(function() {
+                stage.removeChild(instBitmap);
+            }, 2000);
+        }
+        else
+            return; 
     }
 
     function drawBridge(xPos, yPos, status) {
@@ -245,6 +263,8 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
             //double click on tile to fix getting stuck on boss stage
             if(type == "boss") {
                 if(prevSelected == currSelected) {
+                    createjs.Sound.play("alertSound");
+                    removeInstruction();
                     deleteTile(tiles[prevSelected.xPos][prevSelected.yPos]);
                     createTile(prevSelected.xPos, prevSelected.yPos, Math.round(Math.random()*4));
                     lowerBrightness();
@@ -274,7 +294,6 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                     removeMatches(prevSelected)
                     countedMatch = false;
                     removeMatches(currSelected)
-                    createjs.Sound.play("alertSound");
                     if(type != "cmbt") {
                         lowerBrightness();
                     }
@@ -347,6 +366,8 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
                 if (tileType != 0)
                    createTile(column, row, Math.round(Math.random()*4));
                 else {
+                    removeInstruction();
+                    createjs.Sound.play("alertSound");
                     drawBridge(column, row, self); 
                     completedBridge[row][column] = 1;
                 }
@@ -529,12 +550,15 @@ var puzzle = function(stage, iconFiles, grid, numMoves, background, iconSize, go
     function countMatch(index) {
         if (type == "std") {
             if(!countedMatch) {
+                createjs.Sound.play("alertSound");
+                removeInstruction();
                 countedMatch = true;
                 goalMatches[index]++;
                 changeText(resourceLabels[index], goalMatches[index]+"/"+goal[index], index);
             }
         }
         if (type == "cmbt") {
+            removeInstruction();
             if(index == 0) { //attack tile is matched
                 flashStatusAction(0,5);
                 oppHealth -= 10;

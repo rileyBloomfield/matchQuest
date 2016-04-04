@@ -75,7 +75,8 @@ var stageData = {
         src: "res/buttons/nextMapButton.png",
         x: 700,
         y: 555,
-        handler: function() { alert(""); }
+        handler: function() { 
+          $('#insertText').html("Unlock full version to go to the next map!"); $('#finishModal').modal('show'); }
     }, {
         src: "res/buttons/playButton.png",
         x: 240,
@@ -129,7 +130,7 @@ var stageData = {
       numMoves: 25,
       iconSize: 55,
       goal: [2, 2, 2, 2, 2], 
-      instruction: "res/instructions/instruction.png"
+      instruction: "res/instructions/stdInstruction.gif"
     }
   }, {
     backgroundSrc: "res/backgrounds/cmbtBackground.jpg",
@@ -160,7 +161,7 @@ var stageData = {
       numMoves: 25,
       iconSize: 55,
       goal: [20, 20, 20, 20, 20], 
-      instruction: "res/instructions/instruction.png"
+      instruction: "res/instructions/cmbtInstruction.gif"
     }
   }, {
     backgroundSrc: "res/backgrounds/bossBackground.jpg",
@@ -189,7 +190,7 @@ var stageData = {
       numMoves: 140,
       iconSize: 55,
       goal: [20, 20, 20, 20, 20],
-      instruction: "res/instructions/instruction.png",
+      instruction: "res/instructions/bossInstruction.gif",
       goalGrid: [[0,0,0,0,0,0,1,0],
                  [0,0,0,0,1,1,1,0],
                  [1,1,1,1,1,0,0,0],
